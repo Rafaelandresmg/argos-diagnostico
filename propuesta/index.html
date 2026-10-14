@@ -23,6 +23,41 @@
   .next li::before { counter-increment: s; content: counter(s); font: 600 13px/28px var(--mono); text-align: center; background: var(--navy); color: var(--on-navy); border-radius: 50%; width: 28px; height: 28px; }
   .accept { border: 2px solid var(--navy); }
   .ok { background: #E6F4EC; border: 1px solid var(--bajo); border-radius: 8px; padding: 12px 14px; }
+  .summary p { margin: 0 0 8px; }
+  .isnot { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .isnot { grid-template-columns: 1fr; } }
+  .isnot h3 { font: 600 14px/1.3 var(--sans); margin: 0 0 6px; color: var(--navy); }
+  .isnot ul { margin: 0; padding-left: 18px; font-size: 14px; }
+  .conds { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
+  .conds li { display: grid; grid-template-columns: 36px 1fr; gap: 6px; }
+  .conds li b { font: 600 13px/1.6 var(--mono); color: var(--bronce-ink); }
+  .print-only { display: none; }
+  .sign { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 10px; }
+  .sign div { border-top: 1px solid var(--ink); padding-top: 6px; font-size: 12px; }
+
+  @media print {
+    @page { size: A4; margin: 16mm 15mm 18mm; @bottom-left { content: "Argos Compliance, C.A. (en constitución) · Propuesta comercial"; font: 8pt Poppins, sans-serif; color: #5D6A79; } @bottom-right { content: "Página " counter(page) " de " counter(pages); font: 8pt Poppins, sans-serif; color: #5D6A79; } }
+    @page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+    body { background: #fff; font-size: 10.5pt; }
+    .wrap { max-width: none; padding: 0; }
+    header.top, .hero, #acc, .no-print { display: none !important; }
+    .print-only { display: block; }
+    .card { border: 0; border-radius: 0; padding: 0; margin: 0 0 9mm; }
+    .card .label { font-size: 9pt; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 8px; }
+    .panel { border: 1px solid var(--line); }
+    #num-run { string-set: num content(); position: absolute; left: -9999px; }
+    /* Portada: página completa */
+    .cover { height: 297mm; display: flex; flex-direction: column; background: var(--navy); color: var(--on-navy); padding: 22mm 20mm 18mm; break-after: page; }
+    .cover img { height: 18mm; width: auto; align-self: flex-start; }
+    .cover .k { font: 600 9pt var(--sans); letter-spacing: 1.5px; text-transform: uppercase; color: var(--bronce); margin-top: 48mm; }
+    .cover h1 { color: var(--on-navy); font-size: 30pt; line-height: 1.12; margin: 6mm 0 4mm; }
+    .cover .tag2 { font-size: 13pt; color: #C9D4E0; max-width: 140mm; }
+    .cover .meta { margin-top: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6mm 10mm; border-top: 1px solid #24486B; padding-top: 8mm; }
+    .cover .meta span { display: block; font: 600 7.5pt var(--sans); letter-spacing: 1px; text-transform: uppercase; color: #A9B8C8; }
+    .cover .meta b { font: 500 11pt var(--mono); }
+    .cover .foot { margin-top: 10mm; font-size: 8pt; color: #A9B8C8; }
+    .sigblock { break-inside: avoid; }
+  }
 </style>
 </head>
 <body>
@@ -38,6 +73,24 @@
   </div>
 
   <main id="doc" hidden>
+    <span id="num-run"></span>
+    <!-- Portada (solo en el PDF) -->
+    <section class="cover print-only">
+      <img src="../assets/logo-negativo.svg" alt="Argos Compliance">
+      <div class="k">Propuesta de servicio</div>
+      <h1 id="cv-rs"></h1>
+      <p class="tag2">Debida diligencia LC/FT/FPADM rápida, segura y local: listas restrictivas, PEP, sentencias del TSJ y prensa en unos 20 segundos, con el registro de cada consulta.</p>
+      <div class="meta">
+        <div><span>Número</span><b id="cv-num"></b></div>
+        <div><span>Fecha</span><b id="cv-f"></b></div>
+        <div><span>Vigente hasta</span><b id="cv-vig"></b></div>
+        <div><span>Preparada por</span><b id="cv-s"></b></div>
+        <div><span>Atención</span><b id="cv-con"></b></div>
+        <div><span>Contacto</span><b id="cv-wa"></b></div>
+      </div>
+      <p class="foot">Argos Compliance, C.A. (en constitución) · Documento comercial. No constituye una certificación de cumplimiento ni asesoría legal.</p>
+    </section>
+
     <section class="hero">
       <p class="label" style="color:var(--bronce)">Propuesta para</p>
       <h1 id="h-rs"></h1>
@@ -52,6 +105,13 @@
 
     <div class="warn" id="expired" hidden></div>
 
+    <section class="card summary">
+      <p class="label">En pocas palabras</p>
+      <p id="sum1"></p>
+      <p id="sum2"></p>
+      <p id="sum3"></p>
+    </section>
+
     <section class="card" id="sec-diag" hidden>
       <p class="label">Lo que encontramos en su diagnóstico</p>
       <p id="diag-sum"></p>
@@ -61,6 +121,20 @@
     <section class="card">
       <p class="label">Lo que incluye su plan</p>
       <ul class="list" id="alc"></ul>
+    </section>
+
+    <section class="card">
+      <p class="label">Qué es y qué no es Argos</p>
+      <div class="isnot">
+        <div><h3>Argos es</h3><ul>
+          <li>Una herramienta tecnológica de apoyo a la debida diligencia.</li>
+          <li>Consultas a listas de sanciones, Gaceta Oficial, sentencias del TSJ y prensa de acceso público, con una matriz de riesgo configurable.</li>
+          <li>Constancias con código de verificación y código hash SHA-256.</li></ul></div>
+        <div><h3>Argos no es</h3><ul>
+          <li>Un bufete de abogados ni un servicio de asesoría jurídica.</li>
+          <li>Una certificación de su cumplimiento normativo ni un sustituto de sus obligaciones como sujeto obligado.</li>
+          <li>Quien decide: cada coincidencia la evalúa su empresa, y la ausencia de coincidencias no acredita que un sujeto esté libre de riesgo.</li></ul></div>
+      </div>
     </section>
 
     <section class="card">
@@ -86,17 +160,31 @@
     <section class="card">
       <p class="label">Inversión</p>
       <div id="money"></div>
-      <p class="small muted">Montos expresados en dólares de los Estados Unidos de América como moneda de cuenta, pagaderos en bolívares a la tasa oficial del BCV vigente el día del pago. <span id="perm"></span></p>
+    </section>
+
+    <section class="card">
+      <p class="label">Condiciones comerciales</p>
+      <ol class="conds" id="conds"></ol>
     </section>
 
     <section class="card">
       <p class="label">Próximos pasos</p>
       <ol class="next">
-        <li><div><b>Aceptación de esta propuesta</b><div class="small muted">Con el botón de abajo.</div></div></li>
+        <li><div><b>Aceptación de esta propuesta</b><div class="small muted">En línea o firmando este documento.</div></div></li>
         <li><div><b>Firma del contrato de servicio y de los Términos y Condiciones</b><div class="small muted">Le enviamos el contrato, el correo de bienvenida y la guía de uso.</div></div></li>
-        <li><div><b>Configuración y capacitación</b><div class="small muted">16 horas para dejar la matriz y los usuarios listos.</div></div></li>
+        <li><div><b>Configuración y capacitación</b><div class="small muted">16 horas para dejar la matriz, la cartera inicial y los usuarios listos.</div></div></li>
         <li><div><b>Primera consulta</b><div class="small muted">En los días siguientes a la firma.</div></div></li>
       </ol>
+    </section>
+
+    <!-- Aceptación firmada (solo en el PDF) -->
+    <section class="card print-only sigblock">
+      <p class="label">Aceptación</p>
+      <p class="small" id="sig-txt"></p>
+      <div class="sign">
+        <div>Por <b id="sig-rs"></b><br>Nombre:<br>Cargo:<br>Firma y fecha:</div>
+        <div>Por Argos Compliance, C.A.<br>Nombre: <span id="sig-s"></span><br>Cargo:<br>Firma y fecha:</div>
+      </div>
     </section>
 
     <section class="card accept no-print" id="acc">
@@ -118,7 +206,7 @@
       <a class="btn ghost" id="to-asesor" target="_blank" rel="noopener">Enviar a mi asesor por WhatsApp</a>
     </div>
 
-    <p class="legal">Esta propuesta no constituye una certificación de cumplimiento ni asesoría legal. Argos entrega evidencia de cada consulta para que el sujeto obligado decida; la decisión y la responsabilidad siguen siendo de la empresa. Argos Compliance, C.A. se encuentra en proceso de inscripción en el Registro Mercantil: la firma del contrato y la facturación se realizan una vez inscrita. Se rige por el contrato de servicio, los Términos y Condiciones de Argos Compliance y la ley venezolana.</p>
+    <p class="legal">Esta propuesta no constituye una certificación de cumplimiento ni asesoría legal. Argos entrega evidencia de cada consulta para que el sujeto obligado decida; la decisión y la responsabilidad siguen siendo de la empresa. Argos Compliance, C.A. se encuentra en proceso de inscripción en el Registro Mercantil: la firma del contrato y la facturación se realizan una vez inscrita. Se rige por el contrato de servicio, los Términos y Condiciones de Argos Compliance (versión 2.0) y la ley venezolana.</p>
   </main>
 </div>
 
@@ -129,34 +217,55 @@
   var m = location.hash.match(/p=([\w-]+)/), p = m ? A.b64dec(m[1]) : null;
   if (!p || !p.c || !p.num) { $("bad").hidden = false; return; }
   $("doc").hidden = false;
-  document.title = "Propuesta " + p.num + " · Argos Compliance";
-  var vence = A.sumarDias(p.f, p.vig || A.VIGENCIA_DIAS);
-  $("t-num").textContent = p.num; $("h-num").textContent = p.num; $("h-rs").textContent = p.c.rs;
-  $("h-f").textContent = A.fecha(p.f); $("h-vig").textContent = A.fecha(vence); $("h-s").textContent = p.s.n;
-  $("a-rs").textContent = p.c.rs;
+  document.title = "Propuesta " + p.num + " · " + p.c.rs;
+  var vence = A.sumarDias(p.f, p.vig || A.VIGENCIA_DIAS), plan = p.prod === "plan", mm = A.montos(p);
+  function set(id, v) { $(id).textContent = v; }
+  set("t-num", p.num); set("h-num", p.num); set("h-rs", p.c.rs); set("h-f", A.fecha(p.f)); set("h-vig", A.fecha(vence)); set("h-s", p.s.n); set("a-rs", p.c.rs);
+  set("num-run", p.num); set("cv-rs", p.c.rs); set("cv-num", p.num); set("cv-f", A.fecha(p.f)); set("cv-vig", A.fecha(vence)); set("cv-s", p.s.n);
+  set("cv-con", (p.c.con || "—") + (p.c.car ? ", " + p.c.car : "")); set("cv-wa", "WhatsApp " + A.waFmt(p.s.w));
+  set("sig-rs", p.c.rs); set("sig-s", p.s.n);
+  set("sig-txt", "Al firmar, " + p.c.rs + (p.c.rif ? " (RIF " + p.c.rif + ")" : "") + " acepta la propuesta " + p.num + " en los términos aquí descritos. El servicio se formaliza con la firma del contrato de servicio y de los Términos y Condiciones de Argos Compliance.");
 
-  var expired = A.hoy() > vence;
-  if (expired) { $("expired").hidden = false; $("expired").textContent = "Esta propuesta venció el " + A.fecha(vence) + ". Pida a su asesor una versión actualizada."; $("acc").hidden = true; }
+  if (A.hoy() > vence) { $("expired").hidden = false; $("expired").textContent = "Esta propuesta venció el " + A.fecha(vence) + ". Pida a su asesor una versión actualizada."; $("acc").hidden = true; }
 
-  if (p.d && p.d.gaps && p.d.gaps.length) {
+  // En pocas palabras
+  var nb = p.d && p.d.gaps ? p.d.gaps.length : 0, na = nb ? p.d.gaps.filter(function (g) { return g[1]; }).length : 0;
+  set("sum1", nb ? "El diagnóstico de " + p.c.rs + " dio un nivel de riesgo de cumplimiento " + p.d.lv + ", con " + nb + " brechas. Argos cubre " + na + " de ellas desde el primer día." :
+    p.c.rs + " necesita verificar a sus clientes, empleados y proveedores contra listas restrictivas y personas expuestas políticamente, y poder demostrarlo ante una inspección.");
+  set("sum2", "Proponemos " + (plan ? "el plan mensual de Argos: consultas a listas restrictivas, PEP, sentencias del TSJ y prensa en unos 20 segundos, con matriz de riesgo, revisión de la cartera y el registro de cada consulta." : p.q + " consulta(s) única(s) de Argos, sin plan ni instalación."));
+  set("sum3", "Inversión: " + (plan ? A.usd(A.PRECIOS.plan) + " + IVA al mes y una instalación única de " + A.usd(A.PRECIOS.instalacion) + " + IVA; primer pago de " + A.usd(mm.total) + " con IVA." : A.usd(mm.total) + " con IVA.") + " Propuesta vigente hasta el " + A.fecha(vence) + ".");
+
+  if (nb) {
     $("sec-diag").hidden = false;
-    $("diag-sum").innerHTML = "Nivel de riesgo de cumplimiento: <b class='c-" + A.esc(p.d.lv) + "'>" + A.esc(p.d.lv) + "</b> (" + A.esc(p.d.pct) + "% de exposición).";
+    $("diag-sum").innerHTML = "Nivel de riesgo de cumplimiento: <b class='c-" + A.esc(p.d.lv) + "'>" + A.esc(p.d.lv) + "</b> (" + A.esc(p.d.pct) + "% de exposición). Argos cubre " + na + " de sus " + nb + " brechas.";
     $("diag-list").innerHTML = p.d.gaps.map(function (g) { return "<li><span>" + A.esc(g[0]) + (g[1] ? ' <span class="chip argos">Argos lo cubre</span>' : ' <span class="chip">Acción de su empresa</span>') + (g[2] ? ' <span class="chip only">Solo en Argos</span>' : "") + "</span></li>"; }).join("");
   }
   var byK = {}; A.ALCANCE.forEach(function (a) { byK[a.k] = a.t; });
   $("alc").innerHTML = (p.alc || []).filter(function (k) { return byK[k]; }).map(function (k) { return "<li><span>" + A.esc(byK[k]) + "</span></li>"; }).join("");
 
-  var mm = A.montos(p);
   $("money").innerHTML = '<table class="money"><thead><tr><th>Concepto</th><th class="n">Monto</th></tr></thead><tbody>' +
     mm.lines.map(function (l) { return "<tr><td>" + A.esc(l.t) + '</td><td class="n">' + A.usd(l.m) + "</td></tr>"; }).join("") +
-    '<tr><td>IVA (16%)</td><td class="n">' + A.usd(mm.iva) + '</td></tr><tr class="total"><td>' + (p.prod === "plan" ? "Primer pago (primer mes + instalación)" : "Total") + '</td><td class="n">' + A.usd(mm.total) + "</td></tr></tbody></table>" +
-    (p.prod === "plan" ? '<p class="small" style="margin:10px 0 0">Luego, <b>' + A.usd(A.PRECIOS.plan) + " + IVA</b> por mes.</p>" : "");
-  $("perm").textContent = p.prod === "plan" ? "Plan mensual sin compromiso de permanencia." : "";
+    '<tr><td>IVA (16%)</td><td class="n">' + A.usd(mm.iva) + '</td></tr><tr class="total"><td>' + (plan ? "Primer pago (primer mes + instalación)" : "Total") + '</td><td class="n">' + A.usd(mm.total) + "</td></tr></tbody></table>" +
+    (plan ? '<p class="small" style="margin:10px 0 0">Luego, <b>' + A.usd(A.PRECIOS.plan) + " + IVA</b> por mes.</p>" : "");
+
+  // Condiciones comerciales (Términos y Condiciones v2.0, sección 9)
+  var C = [
+    "Precios en dólares de los Estados Unidos de América más IVA. Se facturan en bolívares al tipo de cambio oficial del BCV de la fecha de la factura, con la referencia en dólares.",
+    "Puede pagar en bolívares, al tipo de cambio oficial del BCV de la fecha del pago, o en divisas; en ese caso se agrega el IGTF que corresponda.",
+    plan ? "El plan se paga por adelantado al inicio de cada mes y se renueva automáticamente, salvo cancelación antes del inicio del mes siguiente. Sin compromiso de permanencia." : "Las consultas únicas se pagan por adelantado.",
+    plan ? "Los pagos no son reembolsables, salvo acuerdo escrito o error imputable a Argos; la instalación tampoco, una vez iniciada." : "Las consultas no son reembolsables una vez emitida la constancia, salvo error imputable a Argos.",
+    "Si un pago no se recibe dentro de los 5 días continuos siguientes a su vencimiento, el acceso puede suspenderse hasta su regularización.",
+    "Argos avisará cualquier cambio de precio con 15 días continuos de anticipación; no afecta el período ya pagado.",
+    "Vigencia de esta propuesta: hasta el " + A.fecha(vence) + ". La firma del contrato y la facturación se realizan una vez inscrita Argos Compliance, C.A.",
+    "Controversias: mediación y, de ser necesario, arbitraje en Caracas, conforme a la ley venezolana."
+  ];
+  $("conds").innerHTML = C.map(function (t, i) { return "<li><b>" + (i + 1) + ".</b><span>" + A.esc(t) + "</span></li>"; }).join("");
+
   $("copy-link").addEventListener("click", function () { A.copiar(location.href, $("copy-link")); });
   $("to-asesor").href = A.waLink(p.s.w, "Hola, " + p.s.n + ". Generé la propuesta " + p.num + " para " + p.c.rs + ": " + location.href);
 
   function valid() { return $("a-n").value.trim() && $("a-c").value.trim() && /.+@.+\..+/.test($("a-m").value) && $("a-ok").checked; }
-  ["a-n", "a-c", "a-m", "a-ok"].forEach(function (id) { $(id).addEventListener("input", function () { $("a-go").disabled = !valid(); }); $(id).addEventListener("change", function () { $("a-go").disabled = !valid(); }); });
+  ["a-n", "a-c", "a-m", "a-ok"].forEach(function (id) { ["input", "change"].forEach(function (ev) { $(id).addEventListener(ev, function () { $("a-go").disabled = !valid(); }); }); });
   $("a-go").addEventListener("click", function () {
     if (!valid()) return;
     var when = new Date().toLocaleString("es-VE");

@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "propuesta/nueva/index.html"
+        ],
+        "createdAt": "2026-10-14T21:41:37.422Z",
+        "reason": "Claude: solo etiquetas cortas en mayúsculas (.label, insignia Recomendado, RIESGO ALTO), patrón del sistema de marca y de la constancia v5"
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "propuesta/index.html"
+        ],
+        "createdAt": "2026-10-14T21:41:37.600Z",
+        "reason": "Claude: solo etiquetas cortas en mayúsculas (.label, insignia Recomendado, RIESGO ALTO), patrón del sistema de marca y de la constancia v5"
+      }
+    ]
+  }
+}
