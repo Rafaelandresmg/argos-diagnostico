@@ -49,7 +49,7 @@ table.money tr.total td { font-weight: 600; color: var(--navy); border-bottom: 0
 /* Panel de riesgo (formato de la constancia v5) */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
 .panel-tag { font: 500 12px/1.3 var(--mono); color: var(--ink-muted); display: block; margin-bottom: 14px; }
-.risk-head { font: 700 26px/1.1 var(--sans); margin: 4px 0 8px; }
+.risk-head { font: 700 26px/1.25 var(--sans); margin: 4px 0 8px; }
 .risk-scale { display: flex; gap: 6px; margin: 10px 0 6px; }
 .risk-scale span { flex: 1; text-align: center; font: 500 12px/1 var(--sans); padding: 8px 4px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink-muted); }
 .risk-scale span.on-BAJO { background: var(--bajo); border-color: var(--bajo); color: var(--on-riesgo); font-weight: 700; }
