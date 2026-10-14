@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Alta de cliente Argos</title>
+<link rel="icon" href="../assets/favicon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/argos.css">
+<style>
+  .mail { white-space: pre-wrap; font: 400 14px/1.6 var(--sans); background: var(--surface-alt); border-radius: 8px; padding: 12px 14px; }
+  .orden { font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.5; text-align: justify; background: #fff; color: #000; padding: 24px; border: 1px solid var(--line); border-radius: 8px; }
+  .orden h3 { font-size: 14pt; text-align: center; text-transform: uppercase; margin: 0 0 4px; }
+  .orden h4 { font-size: 12pt; text-transform: uppercase; margin: 16px 0 6px; }
+  .orden p { margin: 0 0 6px; }
+  .orden table { width: 100%; border-collapse: collapse; font-size: 11pt; margin: 6px 0; }
+  .orden th, .orden td { border: 1px solid #999; padding: 4px 6px; vertical-align: top; text-align: left; }
+  .orden .pend { background: #FFF176; }
+  .orden .sub { text-align: center; font-weight: bold; }
+  .check label { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); align-items: flex-start; }
+  .check label:first-child { border-top: 0; }
+  @media print {
+    body.print-orden .wrap > :not(#pack), body.print-orden #pack > :not(#orden-card) { display: none !important; }
+    body.print-orden #orden-card { border: 0; padding: 0; }
+    body.print-orden #orden-card > *:not(.orden) { display: none !important; }
+    body.print-orden .orden { border: 0; padding: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img src="../assets/logo.svg" alt="Argos Compliance">
+    <div class="tag">Alta de cliente<br>Uso interno</div>
+  </header>
+
+  <h1>Alta del cliente</h1>
+  <p class="lede">Pegue el enlace de la propuesta que el cliente aceptó. Con esos datos se arma el paquete de inicio.</p>
+
+  <section class="card">
+    <label class="f" for="link">Enlace de la propuesta aceptada<input id="link" placeholder="https://rafaelandresmg.github.io/argos-diagnostico/propuesta/#p=..."></label>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="load" type="button">Cargar propuesta</button><span class="small muted" id="load-msg"></span></div>
+  </section>
+
+  <div id="pack" hidden>
+    <div class="warn">Argos Compliance, C.A. está en proceso de inscripción. <b>No firme el contrato ni facture</b> hasta tenerla inscrita. Mientras tanto, puede enviar el correo de bienvenida y coordinar la capacitación.</div>
+
+    <section class="card" style="margin-top:14px">
+      <p class="label">1 · Datos del cliente</p>
+      <div class="fields">
+        <label for="rs">Razón social<input id="rs"></label>
+        <label for="rif">RIF<input id="rif"></label>
+        <label for="rep">Representante legal<input id="rep"></label>
+        <label for="dom">Domicilio fiscal<input id="dom"></label>
+        <label for="con">Persona de contacto<input id="con"></label>
+        <label for="mail">Correo<input id="mail" type="email"></label>
+      </div>
+      <p class="small muted">Complete lo que falte: se actualizan el correo y la orden de servicio.</p>
+    </section>
+
+    <section class="card">
+      <p class="label">2 · Correo de bienvenida</p>
+      <p class="small"><b>Asunto:</b> <span id="m-subj"></span></p>
+      <div class="mail" id="m-body"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" id="m-copy" type="button">Copiar texto</button>
+        <a class="btn primary" id="m-gmail" target="_blank" rel="noopener">Abrir en Gmail</a>
+      </div>
+      <p class="small muted">Adjunte el contrato de servicio, los Términos y Condiciones y la guía de usuario (puntos 3 y 4).</p>
+    </section>
+
+    <section class="card" id="orden-card">
+      <p class="label">3 · Orden de servicio</p>
+      <div class="orden" id="orden"></div>
+      <div class="row" style="margin-top:10px"><button class="btn ghost" id="o-print" type="button">Imprimir o guardar la orden en PDF</button></div>
+    </section>
+
+    <section class="card">
+      <p class="label">4 · Contrato y guía</p>
+      <p>Complete <b>Contrato_Servicio_Cliente_Argos_CA.docx</b> (carpeta <i>Entregables Claude › Contratos</i>) con estos datos y adjunte <b>Guia_Usuario_Argos</b> y los Términos y Condiciones.</p>
+      <div class="out" id="c-data"></div>
+      <div class="row" style="margin-top:10px"><button class="btn ghost" id="c-copy" type="button">Copiar datos del contrato</button></div>
+    </section>
+
+    <section class="card">
+      <p class="label">5 · Pasos del alta</p>
+      <div class="check" id="check"></div>
+    </section>
+  </div>
+</div>
+
+<script src="../assets/argos.js"></script>
+<script>
+(function () {
+  var A = window.Argos, $ = function (id) { return document.getElementById(id); }, p = null;
+  var STEPS = ["Aceptación recibida por WhatsApp", "Correo de bienvenida enviado", "Contrato y Términos y Condiciones firmados (después de la inscripción de la C.A.)",
+    "Pago de la instalación recibido", "Usuarios creados en Argos", "Capacitación (16 horas) completada", "Primera consulta realizada"];
+
+  function load(str) {
+    var m = String(str).match(/p=([\w-]+)/); p = m ? A.b64dec(m[1]) : null;
+    if (!p || !p.c) { $("load-msg").textContent = "No es un enlace de propuesta válido."; $("pack").hidden = true; return; }
+    $("load-msg").textContent = "Propuesta " + p.num + " cargada."; $("pack").hidden = false;
+    ["rs", "rif", "rep", "dom", "con", "mail"].forEach(function (k) { $(k).value = p.c[k] || ""; });
+    var done = A.store("alta." + p.num) || [];
+    $("check").innerHTML = STEPS.map(function (s, i) { return '<label><input type="checkbox" data-i="' + i + '"' + (done[i] ? " checked" : "") + "><span>" + A.esc(s) + "</span></label>"; }).join("");
+    update();
+  }
+  $("load").addEventListener("click", function () { load($("link").value); });
+  if (location.hash.indexOf("p=") >= 0) { $("link").value = location.href; load(location.hash); }
+
+  $("check").addEventListener("change", function () {
+    var v = [].map.call(document.querySelectorAll("#check input"), function (x) { return x.checked; }); A.store("alta." + p.num, v);
+  });
+  ["rs", "rif", "rep", "dom", "con", "mail"].forEach(function (k) { $(k).addEventListener("input", update); });
+
+  function v(k, fallback) { var x = $(k).value.trim(); return x || fallback; }
+  function pend(t) { return '<span class="pend">[verificar: ' + A.esc(t) + "]</span>"; }
+  function val(k, t) { var x = $(k).value.trim(); return x ? A.esc(x) : pend(t); }
+
+  function update() {
+    var rs = v("rs", "{{nombre_entidad}}"), con = v("con", "{{nombre_contacto}}"), hoy = A.fecha(A.hoy()), wa = A.waFmt(p.s.w);
+    var subj = "Bienvenido a Argos Compliance, " + rs;
+    var body = "Hola " + con + ":\n\nGracias por confiar en Argos Compliance. Su solicitud de alta para " + rs + " quedó registrada el " + hoy + ", con la propuesta " + p.num + ".\n\n" +
+      "Próximos pasos:\n1. Revise y firme el contrato de servicio y los Términos y Condiciones que adjuntamos. Ambos documentos definen el alcance del servicio y sus límites.\n" +
+      "2. Una vez firmado el contrato, le enviaremos sus credenciales de acceso. Cada usuario que designe tendrá un rol con permisos propios.\n" +
+      "3. Lea la guía de usuario adjunta antes de su primera consulta.\n4. Coordinaremos con usted las 16 horas de configuración y capacitación, y la carga de sus primeros clientes.\n\n" +
+      "Recuerde: Argos Compliance es una herramienta de apoyo para la debida diligencia. Las constancias que emite registran las consultas realizadas y la fecha en que se hicieron. No certifican el cumplimiento de su entidad ni sustituyen su evaluación y su decisión, que son responsabilidad de su entidad.\n\n" +
+      "Para dudas, escríbanos por WhatsApp al " + wa + ".\n\nAtentamente,\n" + p.s.n + "\nArgos Compliance";
+    $("m-subj").textContent = subj; $("m-body").textContent = body;
+    $("m-copy").onclick = function () { A.copiar("Asunto: " + subj + "\n\n" + body, $("m-copy")); };
+    $("m-gmail").href = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent(v("mail", "")) + "&su=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body);
+
+    var plan = p.prod === "plan";
+    $("orden").innerHTML = "<h3>Orden de servicio</h3><p class='sub'>" + A.esc(p.num) + " · Borrador. No tiene efectos hasta que la sociedad esté inscrita y las partes la firmen.</p>" +
+      "<p><i>Esta orden complementa el contrato de servicio y los Términos y Condiciones. En caso de contradicción, prevalece el contrato.</i></p>" +
+      "<h4>1. Partes</h4><p>1.1 <b>Proveedor:</b> Argos Compliance, C.A., " + pend("RIF, domicilio y número de inscripción en el Registro Mercantil") + ", representada por " + pend("representante legal") + ".</p>" +
+      "<p>1.2 <b>Cliente:</b> " + val("rs", "razón social") + ", RIF " + val("rif", "RIF") + ", domicilio " + val("dom", "domicilio fiscal") + ", representada por " + val("rep", "representante legal") + ".</p>" +
+      "<h4>2. Servicios contratados</h4><table><thead><tr><th>Concepto</th><th>Monto (US$, sin IVA)</th><th>Condiciones</th></tr></thead><tbody>" +
+      (plan ? "<tr><td>Instalación y puesta en marcha (pago único)</td><td>600</td><td>" + pend("momento de facturación") + ". Incluye la configuración inicial y 16 horas de capacitación de los usuarios designados.</td></tr>" +
+              "<tr><td>Plan mensual</td><td>200 por mes</td><td>Acceso a la plataforma, consultas en las listas activas y emisión de constancias, hasta 2.000 consultas al año.</td></tr>"
+            : "<tr><td>Consulta única × " + p.q + "</td><td>" + (20 * p.q) + "</td><td>Consultas puntuales, sin plan mensual ni instalación.</td></tr>") +
+      "</tbody></table><p>2.1 A los montos se les suma el IVA vigente.</p><p>2.2 Los precios se expresan en dólares de los Estados Unidos de América, como moneda de cuenta. El pago se realiza en bolívares a la tasa oficial del BCV vigente el día del pago. " + pend("forma de pago aceptada") + "</p>" +
+      "<h4>3. Vigencia y plazo</h4><p>3.1 " + (plan ? "El plan mensual se renueva por periodos de un mes, salvo aviso de cualquiera de las partes con " + pend("plazo de preaviso según el contrato") + "." : "Las consultas se prestan a solicitud del cliente.") + "</p>" +
+      "<p>3.2 Argos Compliance no garantiza una fecha de puesta en marcha mientras no esté completada la funcionalidad de multi-cliente (aislamiento de datos entre entidades). El cliente será informado por escrito antes de iniciar el uso productivo.</p>" +
+      "<h4>4. Obligaciones del cliente</h4><p>4.1 Designar a sus usuarios y mantener al día sus datos de contacto.</p><p>4.2 Decidir sobre cada operación con base en su propia evaluación. Las constancias de Argos registran consultas; no constituyen dictamen jurídico ni certificación de cumplimiento.</p><p>4.3 Cumplir las obligaciones que la normativa LC/FT/FPADM impone a su entidad como sujeto obligado.</p>" +
+      "<h4>5. Datos y confidencialidad</h4><p>5.1 El tratamiento de datos personales se rige por el anexo de datos personales y por los Términos y Condiciones. " + pend("anexo de encargado del tratamiento, pendiente") + "</p><p>5.2 Al terminar el servicio, el cliente podrá descargar sus expedientes en un plazo de 30 días.</p>" +
+      "<h4>6. Firmas</h4><table><thead><tr><th>Por Argos Compliance, C.A.</th><th>Por " + val("rs", "razón social") + "</th></tr></thead><tbody><tr><td><br><br>Nombre: " + pend("firmante") + "<br>Cargo:<br>Fecha:</td><td><br><br>Nombre: " + val("rep", "representante legal") + "<br>Cargo:<br>Fecha:</td></tr></tbody></table>";
+
+    var cdata = "nombre_entidad: " + v("rs", "") + "\nrif_entidad: " + v("rif", "") + "\ndomicilio_entidad: " + v("dom", "") + "\nrepresentante_cliente: " + v("rep", "") + "\nnombre_contacto: " + v("con", "") +
+      "\ncorreo: " + v("mail", "") + "\nproducto: " + (plan ? "Plan mensual US$200 + IVA; instalación US$600 + IVA" : "Consulta única × " + p.q) + "\npropuesta: " + p.num;
+    $("c-data").textContent = cdata; $("c-copy").onclick = function () { A.copiar(cdata, $("c-copy")); };
+  }
+  $("o-print").addEventListener("click", function () { document.body.classList.add("print-orden"); window.print(); setTimeout(function () { document.body.classList.remove("print-orden"); }, 500); });
+})();
+</script>
+</body>
+</html>

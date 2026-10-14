@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Consulta en vivo Argos</title>
+<link rel="icon" href="../assets/favicon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/argos.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img src="../assets/logo.svg" alt="Argos Compliance">
+    <div class="tag">Consulta en vivo<br>Exploratoria · sin valor de constancia</div>
+  </header>
+
+  <h1>Consulta en vivo</h1>
+  <p class="lede">Consulte un nombre contra listas restrictivas, PEP, sentencias del TSJ y prensa. Es una consulta exploratoria: no crea expediente ni emite constancia, y queda registrada en la bitácora de Argos a nombre de quien la hace.</p>
+
+  <div class="warn" id="demo-note" hidden>Modo demostración: la conexión con Argos todavía no está activa. Abajo se muestra un ejemplo ilustrativo, no una consulta real.</div>
+
+  <section class="card" id="login" hidden>
+    <p class="label">Acceso del vendedor</p>
+    <div class="fields">
+      <label for="cid">Usuario de socio<input id="cid" autocomplete="username"></label>
+      <label for="csec">Secreto<input id="csec" type="password" autocomplete="current-password"></label>
+    </div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="do-login" type="button">Entrar</button><span class="small muted" id="login-msg"></span></div>
+    <p class="small muted">El secreto no se guarda: el acceso dura lo que dura la sesión.</p>
+  </section>
+
+  <section class="card" id="form">
+    <p class="label">Sujeto a consultar</p>
+    <div class="fields">
+      <label for="q-name">Nombre completo o razón social *<input id="q-name"></label>
+      <label for="q-doc">Documento (cédula o RIF)<input id="q-doc" placeholder="V-00000000"></label>
+      <label for="q-type">Tipo
+        <select id="q-type"><option value="INDIVIDUAL">Persona natural</option><option value="ORGANIZATION">Persona jurídica</option></select></label>
+      <label for="q-nat">Nacionalidad<input id="q-nat" placeholder="Venezolana"></label>
+      <label for="q-op">Operación (solo para mostrar)<input id="q-op" placeholder="Ej.: compra de inmueble"></label>
+    </div>
+    <p class="small muted">Use un nombre que el prospecto le proporcione para la demostración. No consulte a terceros sin una razón legítima.</p>
+    <div class="row" style="margin-top:12px"><button class="btn accent" id="go" type="button">Consultar</button><span class="small muted" id="go-msg"></span></div>
+  </section>
+
+  <section id="out" hidden></section>
+
+  <div class="row no-print" style="margin-top:14px">
+    <a class="btn ghost" id="to-prop" href="../propuesta/nueva/">Seguir con la propuesta</a>
+  </div>
+</div>
+
+<script src="../assets/argos.js"></script>
+<script>
+/* Conexión con Argos. Mientras `base` esté vacío, la página funciona en modo demostración.
+   Fase C: poner la URL de la instancia de Argos y confirmar la ruta de socio que habilite José. */
+var ARGOS_API = { base: "", token: "/api/v1/partner/token", scan: "/api/v1/partner/scan" };
+
+(function () {
+  var A = window.Argos, $ = function (id) { return document.getElementById(id); }, token = null;
+  var live = !!ARGOS_API.base;
+  var diag = location.hash.match(/d=([\w-]+)/);
+  if (diag) $("to-prop").href = "../propuesta/nueva/#d=" + diag[1];
+  $("demo-note").hidden = live; $("login").hidden = !live;
+  if (!live) { $("form").hidden = true; render(demoResult(), true); return; }
+
+  $("do-login").addEventListener("click", function () {
+    $("login-msg").textContent = "Entrando…";
+    fetch(ARGOS_API.base + ARGOS_API.token, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clientId: $("cid").value.trim(), clientSecret: $("csec").value }) })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) { token = j.accessToken; $("csec").value = ""; $("login-msg").textContent = "Sesión iniciada."; })
+      .catch(function () { $("login-msg").textContent = "Usuario o secreto incorrectos, o el servicio no responde."; });
+  });
+
+  $("go").addEventListener("click", function () {
+    var name = $("q-name").value.trim();
+    if (!name) { $("go-msg").textContent = "Escriba un nombre."; return; }
+    if (!token) { $("go-msg").textContent = "Primero inicie sesión."; return; }
+    $("go-msg").textContent = "Consultando…";
+    var body = { fullName: name, entityType: $("q-type").value };
+    if ($("q-doc").value.trim()) body.documentId = $("q-doc").value.trim();
+    if ($("q-nat").value.trim()) body.nationality = $("q-nat").value.trim();
+    fetch(ARGOS_API.base + ARGOS_API.scan, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }, body: JSON.stringify(body) })
+      .then(function (r) { if (r.status === 401) { token = null; throw new Error("La sesión venció; vuelva a entrar."); } if (!r.ok) throw new Error("El servicio respondió " + r.status + "."); return r.json(); })
+      .then(function (res) { $("go-msg").textContent = ""; render(fromApi(res), false); })
+      .catch(function (e) { $("go-msg").textContent = e.message || "No se pudo consultar."; });
+  });
+
+  // Traduce la respuesta de POST /screening/scan (ScanResult) al panel.
+  function lvl(x) { x = String(x || "").toUpperCase(); return /HIGH|ALTO/.test(x) ? "ALTO" : /MOD/.test(x) ? "MODERADO" : /LOW|BAJO/.test(x) ? "BAJO" : null; }
+  function fromApi(r) {
+    var risk = r.risk || {}, level = lvl(risk.level) || (risk.ifConfirmed && lvl(risk.ifConfirmed.level)) || null;
+    var pep = r.pep && r.pep.status, pepAct = pep === "PEP_ACTIVE" || pep === "PEP_FORMER" || pep === "PEP_CANDIDATE";
+    if (pepAct) level = "ALTO";
+    var tsjHits = r.tsj && (r.tsj.matchCount || (r.tsj.matches && r.tsj.matches.length)) || 0;
+    var newsHits = r.news && (r.news.matchCount || (r.news.matches && r.news.matches.length)) || 0;
+    var listHits = r.matchCount || 0, parts = [];
+    if (pepAct) parts.push(pep === "PEP_ACTIVE" ? "es Persona Expuesta Políticamente con cargo activo" : "figura como Persona Expuesta Políticamente");
+    if (listHits) parts.push("tiene " + listHits + " coincidencia(s) por confirmar en listas restrictivas");
+    if (tsjHits) parts.push("registra " + tsjHits + " mención(es) en sentencias del TSJ");
+    if (newsHits) parts.push("registra " + newsHits + " mención(es) en prensa");
+    return {
+      level: level, range: !level && risk.min && risk.max ? (lvl(risk.min.level) + " a " + lvl(risk.max.level)) : null,
+      text: parts.length ? "El sujeto " + parts.join(", ") + ". Las coincidencias por nombre requieren confirmación de identidad." : "No se encontraron coincidencias en las fuentes consultadas.",
+      matrix: risk.matrixVersion ? "Calculado con la matriz de riesgo vigente, versión " + risk.matrixVersion + "." : "Sin matriz publicada: el nivel se infiere de las coincidencias.",
+      subject: { n: r.query.fullName, d: r.query.documentId || "—", t: $("q-type").value === "ORGANIZATION" ? "Persona jurídica" : "Persona natural", na: r.query.nationality || "—", op: $("q-op").value.trim() || "—",
+        cov: r.listsNotScreened && r.listsNotScreened.length ? "Parcial · " + r.listsNotScreened.length + " lista(s) sin consultar" : "Completa · todas las fuentes activas" },
+      sources: [["Listas restrictivas", listHits], ["PEP · Gaceta Oficial", pepAct ? 1 : 0, r.pep === null], ["Sentencias del TSJ", tsjHits, r.tsj === null], ["Prensa", newsHits, r.news === null]],
+      when: new Date(r.scannedAt || Date.now()).toLocaleString("es-VE")
+    };
+  }
+  function demoResult() {
+    return { level: "ALTO", text: "El sujeto es Persona Expuesta Políticamente con cargo activo, aparece en una lista de sanciones vigente y registra menciones recientes en prensa.",
+      matrix: "Calculado con la matriz de riesgo del emisor, versión 1.2 (niveles bajo, moderado y alto).",
+      subject: { n: "María Fernanda Pérez Rojas", d: "V-00.000.000", t: "Persona natural", na: "Venezolana", op: "Compra de inmueble", cov: "Completa · todas las fuentes activas" },
+      sources: [["Listas restrictivas", 1], ["PEP · Gaceta Oficial", 1], ["Sentencias del TSJ", 0], ["Prensa", 1]], when: null };
+  }
+  function render(r, demo) {
+    var lv = r.level, scale = ["BAJO", "MODERADO", "ALTO"].map(function (x) { return '<span class="' + (x === lv ? "on-" + x : "") + '">' + x.charAt(0) + x.slice(1).toLowerCase() + "</span>"; }).join("");
+    $("out").hidden = false;
+    $("out").innerHTML = '<div class="panel"><span class="panel-tag">' + (demo ? "Muestra ilustrativa · no corresponde a una consulta real" : "Consulta exploratoria del " + A.esc(r.when) + " · no es una constancia") + "</span>" +
+      '<span class="label">Nivel de riesgo del sujeto</span><div class="risk-head ' + (lv ? "c-" + lv : "") + '">' + (lv ? "RIESGO " + lv : "RIESGO ENTRE " + A.esc(r.range || "BAJO Y ALTO")) + "</div>" +
+      '<p style="margin:0">' + A.esc(r.text) + '</p><div class="risk-scale">' + scale + '</div><p class="small muted" style="margin:0">' + A.esc(r.matrix) + "</p>" +
+      '<div class="srcs">' + r.sources.map(function (s) {
+        var c = s[2] ? "var(--pc)" : s[1] ? "var(--alto)" : "var(--bajo)", t = s[2] ? "No se pudo consultar" : s[1] ? s[1] + " coincidencia(s)" : "Sin coincidencias";
+        return '<div><b>' + A.esc(s[0]) + '</b><span class="dot" style="background:' + c + '"></span>' + t + "</div>"; }).join("") + "</div>" +
+      '<div class="kv"><div><span>Nombre</span><b>' + A.esc(r.subject.n) + '</b></div><div><span>Documento</span><b>' + A.esc(r.subject.d) + '</b></div><div><span>Tipo</span><b>' + A.esc(r.subject.t) +
+      '</b></div><div><span>Nacionalidad</span><b>' + A.esc(r.subject.na) + '</b></div><div><span>Operación</span><b>' + A.esc(r.subject.op) + '</b></div><div><span>Cobertura</span><b>' + A.esc(r.subject.cov) + "</b></div></div></div>";
+  }
+})();
+</script>
+</body>
+</html>

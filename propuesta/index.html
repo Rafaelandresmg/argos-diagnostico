@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Propuesta Argos Compliance</title>
+<link rel="icon" href="../assets/favicon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/argos.css">
+<style>
+  .hero { background: var(--navy-deep); color: var(--on-navy); border-radius: 12px; padding: 24px; margin-bottom: 14px; }
+  .hero h1 { color: var(--on-navy); }
+  .hero .lede { color: #C9D4E0; margin-bottom: 14px; }
+  .hero .kv { border-top-color: #24486B; }
+  .hero .kv div span { color: #A9B8C8; }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .list li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; }
+  .list li::before { content: "✓"; color: var(--bajo); font-weight: 700; }
+  .gaps li::before { content: "✕"; color: var(--alto); }
+  .next { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .next li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+  .next li::before { counter-increment: s; content: counter(s); font: 600 13px/28px var(--mono); text-align: center; background: var(--navy); color: var(--on-navy); border-radius: 50%; width: 28px; height: 28px; }
+  .accept { border: 2px solid var(--navy); }
+  .ok { background: #E6F4EC; border: 1px solid var(--bajo); border-radius: 8px; padding: 12px 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img src="../assets/logo.svg" alt="Argos Compliance">
+    <div class="tag">Propuesta de servicio<br><span id="t-num"></span></div>
+  </header>
+
+  <div id="bad" class="card" hidden>
+    <h2>No pudimos abrir esta propuesta</h2>
+    <p class="muted">El enlace está incompleto. Pida a su asesor de Argos que se lo envíe de nuevo.</p>
+  </div>
+
+  <main id="doc" hidden>
+    <section class="hero">
+      <p class="label" style="color:var(--bronce)">Propuesta para</p>
+      <h1 id="h-rs"></h1>
+      <p class="lede">Debida diligencia rápida, segura y local: consulta de listas restrictivas, PEP, sentencias del TSJ y prensa en unos 20 segundos, con el registro de cada consulta.</p>
+      <div class="kv">
+        <div><span>Número</span><b id="h-num"></b></div>
+        <div><span>Fecha</span><b id="h-f"></b></div>
+        <div><span>Vigente hasta</span><b id="h-vig"></b></div>
+        <div><span>Preparada por</span><b id="h-s"></b></div>
+      </div>
+    </section>
+
+    <div class="warn" id="expired" hidden></div>
+
+    <section class="card" id="sec-diag" hidden>
+      <p class="label">Lo que encontramos en su diagnóstico</p>
+      <p id="diag-sum"></p>
+      <ul class="list gaps" id="diag-list"></ul>
+    </section>
+
+    <section class="card">
+      <p class="label">Lo que incluye su plan</p>
+      <ul class="list" id="alc"></ul>
+    </section>
+
+    <section class="card">
+      <p class="label">Así se ve una consulta en Argos</p>
+      <div class="panel">
+        <span class="panel-tag">Muestra ilustrativa · no corresponde a una consulta real</span>
+        <span class="label">Nivel de riesgo del sujeto</span>
+        <div class="risk-head c-ALTO">RIESGO ALTO</div>
+        <p style="margin:0">El sujeto es Persona Expuesta Políticamente con cargo activo, aparece en una lista de sanciones vigente y registra menciones recientes en prensa.</p>
+        <div class="risk-scale"><span>Bajo</span><span>Moderado</span><span class="on-ALTO">Alto</span></div>
+        <p class="small muted" style="margin:0">Calculado con la matriz de riesgo del emisor, versión 1.2 (niveles bajo, moderado y alto).</p>
+        <div class="kv">
+          <div><span>Nombre</span><b>María Fernanda Pérez Rojas</b></div>
+          <div><span>Documento</span><b>V-00.000.000</b></div>
+          <div><span>Tipo</span><b>Persona natural</b></div>
+          <div><span>Nacionalidad</span><b>Venezolana</b></div>
+          <div><span>Operación</span><b>Compra de inmueble</b></div>
+          <div><span>Cobertura</span><b>Completa · todas las fuentes activas</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="label">Inversión</p>
+      <div id="money"></div>
+      <p class="small muted">Montos expresados en dólares de los Estados Unidos de América como moneda de cuenta, pagaderos en bolívares a la tasa oficial del BCV vigente el día del pago. <span id="perm"></span></p>
+    </section>
+
+    <section class="card">
+      <p class="label">Próximos pasos</p>
+      <ol class="next">
+        <li><div><b>Aceptación de esta propuesta</b><div class="small muted">Con el botón de abajo.</div></div></li>
+        <li><div><b>Firma del contrato de servicio y de los Términos y Condiciones</b><div class="small muted">Le enviamos el contrato, el correo de bienvenida y la guía de uso.</div></div></li>
+        <li><div><b>Configuración y capacitación</b><div class="small muted">16 horas para dejar la matriz y los usuarios listos.</div></div></li>
+        <li><div><b>Primera consulta</b><div class="small muted">En los días siguientes a la firma.</div></div></li>
+      </ol>
+    </section>
+
+    <section class="card accept no-print" id="acc">
+      <h2>Aceptar la propuesta</h2>
+      <div class="fields">
+        <label for="a-n">Nombre y apellido *<input id="a-n" autocomplete="name"></label>
+        <label for="a-c">Cargo *<input id="a-c" autocomplete="organization-title"></label>
+        <label for="a-m">Correo *<input id="a-m" type="email" autocomplete="email"></label>
+      </div>
+      <label class="row small" style="margin-top:12px;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" id="a-ok" style="margin-top:4px">
+        <span>He leído esta propuesta y la acepto en nombre de <b id="a-rs"></b>. Entiendo que el servicio se formaliza con la firma del contrato de servicio y de los Términos y Condiciones.</span></label>
+      <div class="row" style="margin-top:12px"><button class="btn accent" id="a-go" type="button" disabled>Aceptar y avisar por WhatsApp</button></div>
+      <div class="ok" id="a-done" hidden style="margin-top:12px"></div>
+    </section>
+
+    <div class="row no-print"><button class="btn ghost" type="button" onclick="window.print()">Guardar en PDF</button></div>
+
+    <p class="legal">Esta propuesta no constituye una certificación de cumplimiento ni asesoría legal. Argos entrega evidencia de cada consulta para que el sujeto obligado decida; la decisión y la responsabilidad siguen siendo de la empresa. Argos Compliance, C.A. se encuentra en proceso de inscripción en el Registro Mercantil: la firma del contrato y la facturación se realizan una vez inscrita. Se rige por el contrato de servicio, los Términos y Condiciones de Argos Compliance y la ley venezolana.</p>
+  </main>
+</div>
+
+<script src="../assets/argos.js"></script>
+<script>
+(function () {
+  var A = window.Argos, $ = function (id) { return document.getElementById(id); };
+  var m = location.hash.match(/p=([\w-]+)/), p = m ? A.b64dec(m[1]) : null;
+  if (!p || !p.c || !p.num) { $("bad").hidden = false; return; }
+  $("doc").hidden = false;
+  document.title = "Propuesta " + p.num + " · Argos Compliance";
+  var vence = A.sumarDias(p.f, p.vig || A.VIGENCIA_DIAS);
+  $("t-num").textContent = p.num; $("h-num").textContent = p.num; $("h-rs").textContent = p.c.rs;
+  $("h-f").textContent = A.fecha(p.f); $("h-vig").textContent = A.fecha(vence); $("h-s").textContent = p.s.n;
+  $("a-rs").textContent = p.c.rs;
+
+  var expired = A.hoy() > vence;
+  if (expired) { $("expired").hidden = false; $("expired").textContent = "Esta propuesta venció el " + A.fecha(vence) + ". Pida a su asesor una versión actualizada."; $("acc").hidden = true; }
+
+  if (p.d && p.d.gaps && p.d.gaps.length) {
+    $("sec-diag").hidden = false;
+    $("diag-sum").innerHTML = "Nivel de riesgo de cumplimiento: <b class='c-" + A.esc(p.d.lv) + "'>" + A.esc(p.d.lv) + "</b> (" + A.esc(p.d.pct) + "% de exposición).";
+    $("diag-list").innerHTML = p.d.gaps.map(function (g) { return "<li><span>" + A.esc(g[0]) + (g[1] ? ' <span class="chip argos">Argos lo cubre</span>' : ' <span class="chip">Acción de su empresa</span>') + (g[2] ? ' <span class="chip only">Solo en Argos</span>' : "") + "</span></li>"; }).join("");
+  }
+  var byK = {}; A.ALCANCE.forEach(function (a) { byK[a.k] = a.t; });
+  $("alc").innerHTML = (p.alc || []).filter(function (k) { return byK[k]; }).map(function (k) { return "<li><span>" + A.esc(byK[k]) + "</span></li>"; }).join("");
+
+  var mm = A.montos(p);
+  $("money").innerHTML = '<table class="money"><thead><tr><th>Concepto</th><th class="n">Monto</th></tr></thead><tbody>' +
+    mm.lines.map(function (l) { return "<tr><td>" + A.esc(l.t) + '</td><td class="n">' + A.usd(l.m) + "</td></tr>"; }).join("") +
+    '<tr><td>IVA (16%)</td><td class="n">' + A.usd(mm.iva) + '</td></tr><tr class="total"><td>' + (p.prod === "plan" ? "Primer pago (primer mes + instalación)" : "Total") + '</td><td class="n">' + A.usd(mm.total) + "</td></tr></tbody></table>" +
+    (p.prod === "plan" ? '<p class="small" style="margin:10px 0 0">Luego, <b>' + A.usd(A.PRECIOS.plan) + " + IVA</b> por mes.</p>" : "");
+  $("perm").textContent = p.prod === "plan" ? "Plan mensual sin compromiso de permanencia." : "";
+
+  function valid() { return $("a-n").value.trim() && $("a-c").value.trim() && /.+@.+\..+/.test($("a-m").value) && $("a-ok").checked; }
+  ["a-n", "a-c", "a-m", "a-ok"].forEach(function (id) { $(id).addEventListener("input", function () { $("a-go").disabled = !valid(); }); $(id).addEventListener("change", function () { $("a-go").disabled = !valid(); }); });
+  $("a-go").addEventListener("click", function () {
+    if (!valid()) return;
+    var when = new Date().toLocaleString("es-VE");
+    var msg = "ACEPTACIÓN DE PROPUESTA " + p.num + "\nEmpresa: " + p.c.rs + " (" + p.c.rif + ")\nAcepta: " + $("a-n").value.trim() + ", " + $("a-c").value.trim() +
+      "\nCorreo: " + $("a-m").value.trim() + "\nFecha y hora: " + when + "\nEnlace: " + location.href;
+    window.open(A.waLink(p.s.w, msg), "_blank", "noopener");
+    $("a-done").hidden = false;
+    $("a-done").innerHTML = "<b>Gracias.</b> Se abrió WhatsApp con su aceptación para " + A.esc(p.s.n) + " (" + A.esc(A.waFmt(p.s.w)) + "). Envíe el mensaje para completarla. Si WhatsApp no se abrió, escriba a ese número indicando el número de propuesta " + A.esc(p.num) + ".";
+  });
+})();
+</script>
+</body>
+</html>
