@@ -83,6 +83,8 @@
   <section class="card" data-step="3" hidden>
     <h2>3. Revisión</h2>
     <div id="review"></div>
+    <label class="row small" style="margin-top:14px;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" id="cons" style="margin-top:4px">
+      <span>Autorizo a Argos Compliance a usar los datos de este formulario para preparar mi propuesta y contactarme sobre ella. Puedo pedir que los corrijan o los eliminen escribiendo a mi asesor, en ejercicio del derecho de habeas data (artículo 28 de la Constitución).</span></label>
     <div class="warn" id="missing" hidden style="margin-top:12px"></div>
     <div class="row" style="margin-top:14px">
       <button class="btn accent" id="gen" type="button" style="font-size:16px;padding:16px 22px">Generar mi propuesta →</button>
@@ -145,12 +147,12 @@
   }
   function missing() {
     var p = data(), miss = [];
-    if (!p.c.rs) miss.push("razón social"); if (!p.c.rif) miss.push("RIF"); if (!p.c.con) miss.push("su nombre"); if (!/.+@.+\..+/.test(p.c.mail)) miss.push("correo");
+    if (!p.c.rs) miss.push("razón social"); if (!p.c.rif) miss.push("RIF"); if (!p.c.con) miss.push("su nombre"); if (!/.+@.+\..+/.test(p.c.mail)) miss.push("correo"); if (!$("cons").checked) miss.push("la autorización de uso de datos");
     return miss;
   }
   function review() {
     var p = data(), mm = A.montos(p), miss = missing();
-    $("missing").hidden = !miss.length; $("missing").textContent = "Falta completar: " + miss.join(", ") + " (paso 1).";
+    $("missing").hidden = !miss.length; $("missing").textContent = "Falta completar: " + miss.join(", ") + ".";
     $("gen").disabled = !!miss.length;
     $("review").innerHTML = '<div class="kv" style="border-top:0;margin-top:0;padding-top:0">' +
       "<div><span>Empresa</span><b>" + A.esc(p.c.rs || "—") + "</b></div><div><span>RIF</span><b>" + A.esc(p.c.rif || "—") + "</b></div>" +
@@ -175,6 +177,7 @@
     if (missing().length) return;
     var p = data();
     p.num = A.numero(iniciales(ase.nombre)); p.f = A.hoy(); p.vig = A.VIGENCIA_DIAS;
+    p.cons = { v: "2026-10-14", at: new Date().toISOString() };
     location.href = new URL("../", location.href).href + "#p=" + A.b64enc(p);
   });
   go(1); window.scrollTo(0, 0);
