@@ -112,7 +112,11 @@
       <div class="ok" id="a-done" hidden style="margin-top:12px"></div>
     </section>
 
-    <div class="row no-print"><button class="btn ghost" type="button" onclick="window.print()">Guardar en PDF</button></div>
+    <div class="row no-print">
+      <button class="btn ghost" type="button" onclick="window.print()">Guardar en PDF</button>
+      <button class="btn ghost" type="button" id="copy-link">Copiar enlace de la propuesta</button>
+      <a class="btn ghost" id="to-asesor" target="_blank" rel="noopener">Enviar a mi asesor por WhatsApp</a>
+    </div>
 
     <p class="legal">Esta propuesta no constituye una certificación de cumplimiento ni asesoría legal. Argos entrega evidencia de cada consulta para que el sujeto obligado decida; la decisión y la responsabilidad siguen siendo de la empresa. Argos Compliance, C.A. se encuentra en proceso de inscripción en el Registro Mercantil: la firma del contrato y la facturación se realizan una vez inscrita. Se rige por el contrato de servicio, los Términos y Condiciones de Argos Compliance y la ley venezolana.</p>
   </main>
@@ -148,6 +152,8 @@
     '<tr><td>IVA (16%)</td><td class="n">' + A.usd(mm.iva) + '</td></tr><tr class="total"><td>' + (p.prod === "plan" ? "Primer pago (primer mes + instalación)" : "Total") + '</td><td class="n">' + A.usd(mm.total) + "</td></tr></tbody></table>" +
     (p.prod === "plan" ? '<p class="small" style="margin:10px 0 0">Luego, <b>' + A.usd(A.PRECIOS.plan) + " + IVA</b> por mes.</p>" : "");
   $("perm").textContent = p.prod === "plan" ? "Plan mensual sin compromiso de permanencia." : "";
+  $("copy-link").addEventListener("click", function () { A.copiar(location.href, $("copy-link")); });
+  $("to-asesor").href = A.waLink(p.s.w, "Hola, " + p.s.n + ". Generé la propuesta " + p.num + " para " + p.c.rs + ": " + location.href);
 
   function valid() { return $("a-n").value.trim() && $("a-c").value.trim() && /.+@.+\..+/.test($("a-m").value) && $("a-ok").checked; }
   ["a-n", "a-c", "a-m", "a-ok"].forEach(function (id) { $(id).addEventListener("input", function () { $("a-go").disabled = !valid(); }); $(id).addEventListener("change", function () { $("a-go").disabled = !valid(); }); });

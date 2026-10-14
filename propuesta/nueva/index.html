@@ -4,107 +4,88 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Generador de propuestas Argos</title>
+<title>Su propuesta Argos</title>
 <link rel="icon" href="../../assets/favicon.svg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <link rel="stylesheet" href="../../assets/argos.css">
 <style>
-  .alc label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1px solid var(--line); }
-  .alc label:first-child { border-top: 0; }
-  .prod { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .list li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; }
+  .list li::before { content: "✓"; color: var(--bajo); font-weight: 700; }
+  .gaps li::before { content: "✕"; color: var(--alto); }
+  .prod { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
   .prod label { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; cursor: pointer; }
   .prod label:has(input:checked) { border: 2px solid var(--navy); }
   .prod b { font: 600 22px/1.2 var(--mono); color: var(--navy); }
-  .vend summary { cursor: pointer; font-weight: 500; }
+  .rec { justify-self: start; background: var(--bronce); color: var(--on-bronce); font: 600 11px/1 var(--sans); letter-spacing: .6px; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <img src="../../assets/logo.svg" alt="Argos Compliance">
-    <div class="tag">Generador de propuestas<br>Uso interno</div>
+    <div class="tag">Su propuesta<br>3 pasos</div>
   </header>
 
-  <h1>Nueva propuesta</h1>
-  <p class="lede">Complete los cuatro pasos. Al final obtiene el enlace de la propuesta para enviarlo al cliente. Los datos viajan dentro del enlace y no se guardan en ningún servidor.</p>
+  <h1>Reciba su propuesta</h1>
+  <p class="lede">Tres pasos y la tiene en pantalla, con lo que incluye el plan, la inversión y la opción de aceptarla.</p>
 
-  <details class="card vend" id="vend">
-    <summary>Vendedor: <span id="v-name"></span></summary>
+  <details class="card" id="vend" hidden>
+    <summary>Asesor: <span id="v-name"></span></summary>
     <div class="fields" style="margin-top:12px">
       <label for="vn">Nombre<input id="vn"></label>
-      <label for="vi">Iniciales (para el número)<input id="vi" maxlength="3"></label>
       <label for="vw">WhatsApp, con 58 delante<input id="vw" inputmode="numeric" placeholder="584121234567"></label>
     </div>
-    <p class="small muted">Se guarda solo en este equipo. Cada aceptación llega a este WhatsApp.</p>
-    <button class="btn ghost" id="v-save" type="button">Guardar vendedor</button>
+    <button class="btn ghost" id="v-save" type="button" style="margin-top:10px">Usar este asesor</button>
   </details>
 
   <div class="card" id="diag-card" hidden>
-    <p class="label">Viene del diagnóstico</p>
-    <p id="diag-sum"></p>
-    <div id="diag-gaps" class="alc"></div>
-    <p class="small muted">Las brechas marcadas aparecen en la propuesta, en "Lo que encontramos en su diagnóstico".</p>
+    <p class="label">Lo que encontramos en su diagnóstico</p>
+    <p id="diag-sum" style="margin-top:0"></p>
+    <ul class="list gaps" id="diag-list"></ul>
   </div>
 
   <nav class="steps-nav" aria-label="Pasos">
-    <button type="button" data-s="1" aria-current="step">1. Cliente</button>
-    <button type="button" data-s="2">2. Alcance</button>
-    <button type="button" data-s="3">3. Honorarios</button>
-    <button type="button" data-s="4">4. Revisión</button>
+    <button type="button" data-s="1" aria-current="step">1. Sus datos</button>
+    <button type="button" data-s="2">2. Su plan</button>
+    <button type="button" data-s="3">3. Revisión</button>
   </nav>
 
   <section class="card" data-step="1">
-    <h2>1. Cliente</h2>
+    <h2>1. Sus datos</h2>
     <div class="fields">
-      <label for="rs">Razón social *<input id="rs" required></label>
+      <label for="rs">Razón social *<input id="rs" autocomplete="organization"></label>
       <label for="rif">RIF *<input id="rif" placeholder="J-00000000-0"></label>
       <label for="sec">Sector
         <select id="sec"><option>Corretaje de seguros</option><option>Agencia de viajes</option><option>Inmobiliaria</option><option>Otro sujeto obligado</option></select></label>
       <label for="ct">Condición tributaria
         <select id="ct"><option>Contribuyente ordinario</option><option>Contribuyente especial</option><option>Contribuyente formal</option></select></label>
-      <label for="con">Persona de contacto *<input id="con"></label>
-      <label for="car">Cargo<input id="car" placeholder="Oficial de cumplimiento"></label>
-      <label for="mail">Correo<input id="mail" type="email"></label>
-      <label for="tel">Teléfono o WhatsApp<input id="tel" inputmode="tel" placeholder="584121234567"></label>
-      <label for="rep">Representante legal<input id="rep"></label>
-      <label for="dom">Domicilio fiscal<input id="dom"></label>
+      <label for="con">Su nombre *<input id="con" autocomplete="name"></label>
+      <label for="car">Su cargo<input id="car" placeholder="Oficial de cumplimiento" autocomplete="organization-title"></label>
+      <label for="mail">Correo *<input id="mail" type="email" autocomplete="email"></label>
+      <label for="tel">Teléfono o WhatsApp<input id="tel" inputmode="tel" autocomplete="tel"></label>
     </div>
-    <p class="small muted">El representante legal y el domicilio se usan después, en la orden de servicio. Puede dejarlos en blanco por ahora.</p>
   </section>
 
   <section class="card" data-step="2" hidden>
-    <h2>2. Alcance</h2>
-    <p class="muted small">Lo que verá el cliente como incluido en el plan.</p>
-    <div class="alc" id="alc"></div>
-  </section>
-
-  <section class="card" data-step="3" hidden>
-    <h2>3. Honorarios</h2>
+    <h2>2. Su plan</h2>
+    <p class="label" style="margin-top:12px">Lo que incluye</p>
+    <ul class="list" id="alc"></ul>
     <div class="prod">
-      <label><span><input type="radio" name="prod" value="plan" checked> Plan mensual</span><b>US$200 <small class="muted">+ IVA / mes</small></b><span class="small muted">Instalación única US$600 + IVA. Sin permanencia.</span></label>
+      <label><span class="rec">Recomendado</span><span><input type="radio" name="prod" value="plan" checked> Plan mensual</span><b>US$200 <small class="muted">+ IVA / mes</small></b><span class="small muted">Instalación única US$600 + IVA, con 16 horas de configuración y capacitación. Sin permanencia.</span></label>
       <label><span><input type="radio" name="prod" value="unica"> Consulta única</span><b>US$20 <small class="muted">+ IVA / consulta</small></b><span class="small muted">Sin plan ni instalación.</span>
         <span class="f" id="q-wrap">Cantidad de consultas <input id="q" type="number" min="1" value="1" style="max-width:120px"></span></label>
     </div>
     <div id="money" style="margin-top:14px"></div>
-    <p class="small muted">Montos en US$ como moneda de cuenta, pagaderos en bolívares a la tasa oficial del BCV del día del pago. Vigencia de la propuesta: 15 días.</p>
+    <p class="small muted">Montos en US$ como moneda de cuenta, pagaderos en bolívares a la tasa oficial del BCV del día del pago.</p>
   </section>
 
-  <section class="card" data-step="4" hidden>
-    <h2>4. Revisión</h2>
+  <section class="card" data-step="3" hidden>
+    <h2>3. Revisión</h2>
     <div id="review"></div>
-    <div class="warn" id="missing" hidden></div>
+    <div class="warn" id="missing" hidden style="margin-top:12px"></div>
     <div class="row" style="margin-top:14px">
-      <button class="btn primary" id="gen" type="button">Generar propuesta</button>
-    </div>
-    <div id="result" hidden style="margin-top:16px">
-      <p class="label">Enlace de la propuesta</p>
-      <div class="out" id="link"></div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn ghost" id="copy" type="button">Copiar enlace</button>
-        <a class="btn ghost" id="wa-client" target="_blank" rel="noopener">Enviar al cliente por WhatsApp</a>
-        <a class="btn accent" id="open" target="_blank" rel="noopener">Ver propuesta</a>
-      </div>
-      <p class="small muted">Guarde este enlace: es la propuesta. Cuando el cliente acepte, péguelo en <a href="../../alta/">Alta del cliente</a>.</p>
+      <button class="btn accent" id="gen" type="button" style="font-size:16px;padding:16px 22px">Generar mi propuesta →</button>
     </div>
   </section>
 
@@ -118,32 +99,34 @@
 <script>
 (function () {
   var A = window.Argos, $ = function (id) { return document.getElementById(id); }, step = 1, diag = null;
+  var qp = new URLSearchParams(location.search);
 
-  // Vendedor
-  function showV() { var v = A.vendedor(); $("vn").value = v.nombre; $("vi").value = v.ini; $("vw").value = v.wa; $("v-name").textContent = v.nombre + " · " + A.waFmt(v.wa); }
-  $("v-save").addEventListener("click", function () {
-    var ini = $("vi").value.trim().toUpperCase().replace(/[^A-Z]/g, "") || "AR";
-    A.store("vendedor", { nombre: $("vn").value.trim() || "Argos Compliance", ini: ini, wa: $("vw").value.replace(/\D/g, "") || A.WA_ARGOS });
-    showV(); $("vend").open = false;
-  });
-  if (!A.store("vendedor")) A.store("vendedor", A.vendedor());
-  showV();
-
-  // Diagnóstico de origen (#d=...)
-  var m = location.hash.match(/d=([\w-]+)/);
-  if (m) diag = A.b64dec(m[1]);
-  if (diag && diag.gaps) {
-    $("diag-card").hidden = false;
-    $("diag-sum").innerHTML = "Nivel de riesgo de cumplimiento: <b class='c-" + A.esc(diag.lv) + "'>" + A.esc(diag.lv) + "</b> (" + A.esc(diag.pct) + "% de exposición), " + diag.gaps.length + " brechas.";
-    $("diag-gaps").innerHTML = diag.gaps.map(function (g, i) {
-      return '<label><input type="checkbox" data-g="' + i + '"' + (g[1] ? " checked" : "") + '><span>' + A.esc(g[0]) + (g[1] ? ' <span class="chip argos">Argos lo cubre</span>' : ' <span class="chip">Acción de su empresa</span>') + '</span></label>';
-    }).join("");
+  // Asesor: el del enlace (?wa=…&n=…), si no, el guardado con ?v=1, si no, Rafael.
+  function asesor() {
+    var wa = (qp.get("wa") || "").replace(/\D/g, "");
+    if (/^\d{10,13}$/.test(wa)) return { nombre: (qp.get("n") || "Asesor de Argos").slice(0, 60), wa: wa };
+    if (qp.get("v") === "1" && A.store("vendedor")) return A.store("vendedor");
+    return { nombre: "Rafael J. Miranda Guerra", wa: A.WA_ARGOS };
+  }
+  function iniciales(n) { return (n.match(/\b[A-ZÁÉÍÓÚÑ]/g) || ["A", "R"]).slice(0, 2).join("").normalize("NFD").replace(/[^A-Z]/g, "") || "AR"; }
+  var ase = asesor();
+  if (qp.get("v") === "1") {
+    $("vend").hidden = false; $("vn").value = ase.nombre; $("vw").value = ase.wa; $("v-name").textContent = ase.nombre + " · " + A.waFmt(ase.wa);
+    $("v-save").addEventListener("click", function () { ase = { nombre: $("vn").value.trim() || ase.nombre, wa: $("vw").value.replace(/\D/g, "") || ase.wa }; A.store("vendedor", ase); $("v-name").textContent = ase.nombre + " · " + A.waFmt(ase.wa); $("vend").open = false; });
   }
 
-  // Alcance
-  $("alc").innerHTML = A.ALCANCE.map(function (a) { return '<label><input type="checkbox" data-a="' + a.k + '"' + (a.def ? " checked" : "") + '><span>' + A.esc(a.t) + '</span></label>'; }).join("");
+  // Diagnóstico de origen (#d=…): se incluyen todas las brechas.
+  var m = location.hash.match(/d=([\w-]+)/);
+  if (m) diag = A.b64dec(m[1]);
+  if (diag && diag.gaps && diag.gaps.length) {
+    $("diag-card").hidden = false;
+    $("diag-sum").innerHTML = "Nivel de riesgo de cumplimiento: <b class='c-" + A.esc(diag.lv) + "'>" + A.esc(diag.lv) + "</b> (" + A.esc(diag.pct) + "% de exposición). Argos cubre " +
+      diag.gaps.filter(function (g) { return g[1]; }).length + " de sus " + diag.gaps.length + " brechas.";
+    $("diag-list").innerHTML = diag.gaps.map(function (g) { return "<li><span>" + A.esc(g[0]) + (g[1] ? ' <span class="chip argos">Argos lo cubre</span>' : ' <span class="chip">Acción de su empresa</span>') + (g[2] ? ' <span class="chip only">Solo en Argos</span>' : "") + "</span></li>"; }).join("");
+  }
 
-  // Honorarios
+  $("alc").innerHTML = A.ALCANCE.map(function (a) { return "<li><span>" + A.esc(a.t) + "</span></li>"; }).join("");
+
   function prod() { return document.querySelector('input[name="prod"]:checked').value; }
   function money() {
     var mm = A.montos({ prod: prod(), q: $("q").value });
@@ -154,51 +137,47 @@
   document.querySelectorAll('input[name="prod"]').forEach(function (r) { r.addEventListener("change", money); });
   $("q").addEventListener("input", money); money();
 
-  // Pasos
+  var F = ["rs", "rif", "sec", "ct", "con", "car", "mail", "tel"];
+  function data() {
+    var c = {}; F.forEach(function (k) { c[k] = $(k).value.trim(); });
+    return { v: 1, c: c, alc: A.ALCANCE.map(function (a) { return a.k; }), prod: prod(), q: Math.max(1, +$("q").value || 1),
+      d: diag && diag.gaps ? { lv: diag.lv, pct: diag.pct, gaps: diag.gaps } : null, s: { n: ase.nombre, w: ase.wa } };
+  }
+  function missing() {
+    var p = data(), miss = [];
+    if (!p.c.rs) miss.push("razón social"); if (!p.c.rif) miss.push("RIF"); if (!p.c.con) miss.push("su nombre"); if (!/.+@.+\..+/.test(p.c.mail)) miss.push("correo");
+    return miss;
+  }
+  function review() {
+    var p = data(), mm = A.montos(p), miss = missing();
+    $("missing").hidden = !miss.length; $("missing").textContent = "Falta completar: " + miss.join(", ") + " (paso 1).";
+    $("gen").disabled = !!miss.length;
+    $("review").innerHTML = '<div class="kv" style="border-top:0;margin-top:0;padding-top:0">' +
+      "<div><span>Empresa</span><b>" + A.esc(p.c.rs || "—") + "</b></div><div><span>RIF</span><b>" + A.esc(p.c.rif || "—") + "</b></div>" +
+      "<div><span>Contacto</span><b>" + A.esc(p.c.con || "—") + "</b></div><div><span>Correo</span><b>" + A.esc(p.c.mail || "—") + "</b></div>" +
+      "<div><span>Plan</span><b>" + (p.prod === "plan" ? "Plan mensual" : "Consulta única × " + p.q) + "</b></div><div><span>Primer pago</span><b>" + A.usd(mm.total) + "</b></div>" +
+      "<div><span>Su asesor</span><b>" + A.esc(p.s.n) + "</b></div><div><span>Vigencia</span><b>15 días</b></div></div>";
+  }
   function go(s) {
-    step = Math.min(4, Math.max(1, s));
+    step = Math.min(3, Math.max(1, s));
     document.querySelectorAll("[data-step]").forEach(function (el) { el.hidden = +el.dataset.step !== step; });
     document.querySelectorAll(".steps-nav button").forEach(function (b) { if (+b.dataset.s === step) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
-    $("prev").disabled = step === 1; $("next").hidden = step === 4;
-    if (step === 4) review();
+    $("prev").disabled = step === 1; $("next").hidden = step === 3;
+    if (step === 3) review();
+    window.scrollTo(0, document.querySelector(".steps-nav").offsetTop - 12);
   }
   document.querySelectorAll(".steps-nav button").forEach(function (b) { b.addEventListener("click", function () { go(+b.dataset.s); }); });
   $("prev").addEventListener("click", function () { go(step - 1); });
   $("next").addEventListener("click", function () { go(step + 1); });
-
-  var F = ["rs", "rif", "sec", "ct", "con", "car", "mail", "tel", "rep", "dom"];
-  function data() {
-    var c = {}; F.forEach(function (k) { c[k] = $(k).value.trim(); });
-    var alc = [].slice.call(document.querySelectorAll("[data-a]:checked")).map(function (x) { return x.dataset.a; });
-    var d = null;
-    if (diag && diag.gaps) d = { lv: diag.lv, pct: diag.pct, gaps: diag.gaps.filter(function (g, i) { var x = document.querySelector('[data-g="' + i + '"]'); return x && x.checked; }) };
-    var v = A.vendedor();
-    return { v: 1, c: c, alc: alc, prod: prod(), q: Math.max(1, +$("q").value || 1), d: d, s: { n: v.nombre, w: v.wa } };
-  }
-  function review() {
-    var p = data(), mm = A.montos(p), miss = [];
-    if (!p.c.rs) miss.push("razón social"); if (!p.c.rif) miss.push("RIF"); if (!p.c.con) miss.push("persona de contacto"); if (!p.alc.length) miss.push("al menos un elemento del alcance");
-    $("missing").hidden = !miss.length; $("missing").textContent = "Falta: " + miss.join(", ") + ".";
-    $("gen").disabled = !!miss.length;
-    $("review").innerHTML = '<div class="kv" style="border-top:0;margin-top:0;padding-top:0">' +
-      "<div><span>Cliente</span><b>" + A.esc(p.c.rs || "—") + "</b></div><div><span>RIF</span><b>" + A.esc(p.c.rif || "—") + "</b></div>" +
-      "<div><span>Contacto</span><b>" + A.esc(p.c.con || "—") + "</b></div><div><span>Producto</span><b>" + (p.prod === "plan" ? "Plan mensual" : "Consulta única × " + p.q) + "</b></div>" +
-      "<div><span>Alcance</span><b>" + p.alc.length + " elementos</b></div><div><span>Total del primer pago</span><b>" + A.usd(mm.total) + "</b></div>" +
-      "<div><span>Brechas del diagnóstico</span><b>" + (p.d ? p.d.gaps.length : "Sin diagnóstico") + "</b></div><div><span>Vendedor</span><b>" + A.esc(p.s.n) + "</b></div></div>";
-  }
-  ["input", "change"].forEach(function (ev) { document.addEventListener(ev, function () { if (step === 4) review(); }); });
+  ["input", "change"].forEach(function (ev) { document.addEventListener(ev, function () { if (step === 3) review(); }); });
 
   $("gen").addEventListener("click", function () {
-    var p = data(), v = A.vendedor();
-    p.num = A.numero(v.ini); p.f = A.hoy(); p.vig = A.VIGENCIA_DIAS;
-    var url = new URL("../", location.href).href + "#p=" + A.b64enc(p);
-    $("result").hidden = false; $("link").textContent = url; $("open").href = url;
-    var msg = "Buenos días, " + (p.c.con || "") + ". Le comparto la propuesta de Argos Compliance para " + p.c.rs + " (" + p.num + "): " + url;
-    $("wa-client").href = p.c.tel ? A.waLink(p.c.tel, msg) : "https://wa.me/?text=" + encodeURIComponent(msg);
-    $("copy").onclick = function () { A.copiar(url, $("copy")); };
-    A.store("ultima", { num: p.num, url: url });
+    if (missing().length) return;
+    var p = data();
+    p.num = A.numero(iniciales(ase.nombre)); p.f = A.hoy(); p.vig = A.VIGENCIA_DIAS;
+    location.href = new URL("../", location.href).href + "#p=" + A.b64enc(p);
   });
-  go(1);
+  go(1); window.scrollTo(0, 0);
 })();
 </script>
 </body>
