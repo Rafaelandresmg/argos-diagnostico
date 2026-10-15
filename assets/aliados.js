@@ -5,4 +5,5 @@
 // No colocar aquí comisiones, montos ni datos personales distintos del nombre y el WhatsApp de trabajo.
 window.ARGOS_ALIADOS = {
   // "CG01": { n: "Carlos Gómez", w: "584121234567" },
+  "AB01": { n: "Alonso Brito", w: "584241105791" },
 };
