@@ -302,7 +302,7 @@
   set("num-run", p.num); set("cv-rs", p.c.rs); set("cv-num", p.num); set("cv-f", A.fecha(p.f)); set("cv-vig", A.fecha(vence)); set("cv-s", p.s.n);
   set("cv-con", (p.c.con || "—") + (p.c.car ? ", " + p.c.car : "")); set("cv-wa", "WhatsApp " + A.waFmt(p.s.w));
   set("sig-rs", p.c.rs); set("sig-s", p.s.n);
-  set("sig-txt", "Al firmar, " + p.c.rs + (p.c.rif ? " (RIF " + p.c.rif + ")" : "") + " acepta la propuesta " + p.num + " en los términos aquí descritos. El servicio se formaliza con la firma del contrato de servicio y de los Términos y Condiciones de Argos Compliance.");
+  set("sig-txt", "Al firmar, " + p.c.rs + (p.c.rif ? " (identificación " + p.c.rif + ")" : "") + " acepta la propuesta " + p.num + " en los términos aquí descritos. El servicio se formaliza con la firma del contrato de servicio y de los Términos y Condiciones de Argos Compliance.");
 
   if (A.hoy() > vence) { $("expired").hidden = false; $("expired").textContent = "Esta propuesta venció el " + A.fecha(vence) + ". Pida a su asesor una versión actualizada."; $("acc").hidden = true; }
 

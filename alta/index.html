@@ -50,7 +50,7 @@
       <p class="label">1 · Datos del cliente</p>
       <div class="fields">
         <label for="rs">Razón social<input id="rs"></label>
-        <label for="rif">RIF<input id="rif"></label>
+        <label for="rif">Identificación<input id="rif"></label>
         <label for="rep">Representante legal<input id="rep"></label>
         <label for="dom">Domicilio fiscal<input id="dom"></label>
         <label for="con">Persona de contacto<input id="con"></label>
@@ -135,7 +135,7 @@
     $("orden").innerHTML = "<h3>Orden de servicio</h3><p class='sub'>" + A.esc(p.num) + " · Borrador. No tiene efectos hasta que la sociedad esté inscrita y las partes la firmen.</p>" +
       "<p><i>Esta orden complementa el contrato de servicio y los Términos y Condiciones. En caso de contradicción, prevalece el contrato.</i></p>" +
       "<h4>1. Partes</h4><p>1.1 <b>Proveedor:</b> Argos Compliance, C.A., " + pend("RIF, domicilio y número de inscripción en el Registro Mercantil") + ", representada por " + pend("representante legal") + ".</p>" +
-      "<p>1.2 <b>Cliente:</b> " + val("rs", "razón social") + ", RIF " + val("rif", "RIF") + ", domicilio " + val("dom", "domicilio fiscal") + ", representada por " + val("rep", "representante legal") + ".</p>" +
+      "<p>1.2 <b>Cliente:</b> " + val("rs", "razón social") + ", identificación " + val("rif", "identificación") + ", domicilio " + val("dom", "domicilio fiscal") + ", representada por " + val("rep", "representante legal") + ".</p>" +
       "<h4>2. Servicios contratados</h4><table><thead><tr><th>Concepto</th><th>Monto (US$, sin IVA)</th><th>Condiciones</th></tr></thead><tbody>" +
       (plan ? "<tr><td>Instalación y puesta en marcha (pago único)</td><td>600</td><td>" + pend("momento de facturación") + ". Incluye la configuración inicial y 16 horas de capacitación de los usuarios designados.</td></tr>" +
               "<tr><td>Plan mensual</td><td>200 por mes</td><td>Acceso a la plataforma, consultas en las listas activas y emisión de constancias, hasta 2.000 consultas al año.</td></tr>"

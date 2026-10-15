@@ -14,6 +14,8 @@
   .list li::before { content: "✓"; color: var(--bajo); font-weight: 700; }
   .gaps li::before { content: "✕"; color: var(--alto); }
   .prod { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
+  .f-id { display: flex; flex-direction: column; gap: 4px; font: 500 13px/1.4 var(--sans); color: var(--ink-muted); min-width: 0; }
+  .idrow { display: grid; grid-template-columns: 76px 1fr; gap: 8px; }
   .prod label { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; cursor: pointer; }
   .prod label:has(input:checked) { border: 2px solid var(--navy); }
   .prod b { font: 600 22px/1.2 var(--mono); color: var(--navy); }
@@ -55,9 +57,13 @@
     <h2>1. Sus datos</h2>
     <div class="fields">
       <label for="rs">Razón social o nombre completo *<input id="rs" autocomplete="organization"></label>
-      <label for="rif">RIF *<input id="rif" placeholder="J, G, V, E o P + 9 dígitos (ej.: J-12345678-9)" autocapitalize="characters"><span class="small" id="rif-msg"></span></label>
+      <div class="f-id"><span id="id-lbl">Identificación *</span>
+        <div class="idrow" role="group" aria-labelledby="id-lbl">
+          <select id="rift" aria-label="Tipo de identificación"><option>J</option><option>V</option><option>G</option><option>E</option></select>
+          <input id="rifn" aria-label="Número de identificación" inputmode="numeric" placeholder="Solo números">
+        </div><span class="small" id="rif-msg"></span></div>
       <label for="sec">Sector
-        <select id="sec"><option value="" disabled selected>Seleccione su sector</option><option>Sociedad de Corretaje de Seguros</option><option>Sociedad de Corretaje de Reaseguro</option><option>Empresa de Seguros</option><option>Medicina Prepagada</option><option>Reaseguradora</option><option>Cooperativa con actividad aseguradora</option><option>Administradora de Riesgos</option><option>Financiadora de Primas</option><option>Sociedad de Ajustadores de Pérdidas</option><option>Abogado</option><option>Contador</option><option>Agente Inmobiliario</option><option>Inmobiliaria</option><option>Organización sin fines de lucro (OSFL)</option><option>Caja de Ahorro</option><option>Agencia de Viajes</option><option>Hotel</option></select></label>
+        <select id="sec"><option value="" disabled selected>Seleccione su sector</option><option>Sociedad de Corretaje de Seguros</option><option>Sociedad de Corretaje de Reaseguro</option><option>Empresa de Seguros</option><option>Medicina Prepagada</option><option>Reaseguradora</option><option>Cooperativa con actividad aseguradora</option><option>Administradora de Riesgos</option><option>Financiadora de Primas</option><option>Sociedad de Ajustadores de Pérdidas</option><option>Abogado</option><option>Contador</option><option>Agente Inmobiliario</option><option>Inmobiliaria</option><option>Organización sin fines de lucro (OSFL)</option><option>Caja de Ahorro</option><option>Agencia de Viajes</option><option>Hotel</option><option>Otros</option></select></label>
       <label for="ct">Condición tributaria
         <select id="ct"><option>Contribuyente ordinario</option><option>Contribuyente especial</option></select></label>
       <label for="con">Su nombre *<input id="con" autocomplete="name"></label>
@@ -139,30 +145,24 @@
   document.querySelectorAll('input[name="prod"]').forEach(function (r) { r.addEventListener("change", money); });
   $("q").addEventListener("input", money); money();
 
-  // RIF venezolano: letra + 8 dígitos + dígito verificador.
-  function rifNorm(v) { var m = String(v || "").toUpperCase().replace(/[\s.]/g, "").match(/^([JGVEP])-?(\d{8})-?(\d)$/); return m ? m[1] + "-" + m[2] + "-" + m[3] : null; }
-  function rifOk(v) { return !!rifNorm(v); }
-  function rifDigitoOk(v) {
-    var n = rifNorm(v); if (!n) return false;
-    var L = { V: 1, E: 2, J: 3, P: 4, G: 5 }[n[0]], d = n.slice(2, 10).split("").map(Number), w = [3, 2, 7, 6, 5, 4, 3, 2];
-    var s = L * 4 + d.reduce(function (a, x, i) { return a + x * w[i]; }, 0), r = 11 - (s % 11);
-    return (r >= 10 ? 0 : r) === +n.slice(-1);
-  }
-  $("rif").addEventListener("blur", function () {
-    var n = rifNorm(this.value);
-    if (n) { this.value = n; }
-    $("rif-msg").textContent = !this.value ? "" : !n ? "Formato: letra J, G, V, E o P, 8 dígitos y el dígito final (ej.: J-12345678-9)." : rifDigitoOk(n) ? "" : "Revise el RIF: el dígito final no coincide.";
-    $("rif-msg").style.color = n && rifDigitoOk(n) ? "" : "var(--moderado)";
+  // Identificación: tipo (J, V, G o E) y número, sin límite de dígitos.
+  function idNum() { return $("rifn").value.replace(/[\s.\-]/g, ""); }
+  function rifOk(v) { return /^[JVGE]-\d+$/.test(v || ""); }
+  $("rifn").addEventListener("blur", function () {
+    var n = idNum(); if (/^\d+$/.test(n)) this.value = n;
+    $("rif-msg").textContent = !this.value || /^\d+$/.test(n) ? "" : "Escriba solo números.";
+    $("rif-msg").style.color = "var(--moderado)";
   });
-  var F = ["rs", "rif", "sec", "ct", "con", "car", "mail", "tel"];
+  var F = ["rs", "sec", "ct", "con", "car", "mail", "tel"];
   function data() {
     var c = {}; F.forEach(function (k) { c[k] = $(k).value.trim(); });
+    c.rif = idNum() ? $("rift").value + "-" + idNum() : "";
     return { v: 1, c: c, alc: A.ALCANCE.map(function (a) { return a.k; }), prod: prod(), q: Math.max(1, +$("q").value || 1),
       d: diag && diag.gaps ? { lv: diag.lv, pct: diag.pct, h: +diag.h || 0, hl: +diag.hl || 0, gaps: diag.gaps } : null, s: { n: ase.nombre, w: ase.wa } };
   }
   function missing() {
     var p = data(), miss = [];
-    if (!p.c.rs) miss.push("razón social o nombre"); if (!rifOk(p.c.rif)) miss.push("un RIF válido (letra J, G, V, E o P y 9 dígitos)"); if (!p.c.sec) miss.push("sector"); if (!p.c.con) miss.push("su nombre"); if (!/.+@.+\..+/.test(p.c.mail)) miss.push("correo"); if (!$("cons").checked) miss.push("la autorización de uso de datos");
+    if (!p.c.rs) miss.push("razón social o nombre"); if (!rifOk(p.c.rif)) miss.push("el número de identificación (solo números)"); if (!p.c.sec) miss.push("sector"); if (!p.c.con) miss.push("su nombre"); if (!/.+@.+\..+/.test(p.c.mail)) miss.push("correo"); if (!$("cons").checked) miss.push("la autorización de uso de datos");
     return miss;
   }
   function review() {
@@ -170,7 +170,7 @@
     $("missing").hidden = !miss.length; $("missing").textContent = "Falta completar: " + miss.join(", ") + ".";
     $("gen").disabled = !!miss.length;
     $("review").innerHTML = '<div class="kv" style="border-top:0;margin-top:0;padding-top:0">' +
-      "<div><span>Empresa</span><b>" + A.esc(p.c.rs || "—") + "</b></div><div><span>RIF</span><b>" + A.esc(p.c.rif || "—") + "</b></div>" +
+      "<div><span>Empresa</span><b>" + A.esc(p.c.rs || "—") + "</b></div><div><span>Identificación</span><b>" + A.esc(p.c.rif || "—") + "</b></div>" +
       "<div><span>Contacto</span><b>" + A.esc(p.c.con || "—") + "</b></div><div><span>Correo</span><b>" + A.esc(p.c.mail || "—") + "</b></div>" +
       "<div><span>Plan</span><b>" + (p.prod === "plan" ? "Plan mensual" : "Consulta única × " + p.q) + "</b></div><div><span>Primer pago</span><b>" + A.usd(mm.total) + "</b></div>" +
       "<div><span>Su asesor</span><b>" + A.esc(p.s.n) + "</b></div><div><span>Vigencia</span><b>15 días</b></div></div>";
