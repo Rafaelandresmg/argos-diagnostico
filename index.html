@@ -142,6 +142,7 @@ button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   </div>
 </div>
 
+<script src="assets/aliados.js"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -278,6 +279,8 @@ button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(function () { btn.textContent = "No se pudo copiar"; });
   });
   var qp = new URLSearchParams(location.search), WA = "0424-125.04.68";
+  var ali = (window.ARGOS_ALIADOS || {})[(qp.get("a") || "").toUpperCase()];
+  if (ali) { qp.set("wa", ali.w); qp.set("n", ali.n); }
   if (/^\d{10,13}$/.test(qp.get("wa") || "")) {
     var d = qp.get("wa").replace(/^58/, "0"); WA = d.slice(0, 4) + "-" + d.slice(4, 7) + "." + d.slice(7, 9) + "." + d.slice(9);
     $("phone").textContent = WA;

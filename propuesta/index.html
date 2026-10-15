@@ -115,7 +115,7 @@
         <div><span>Número</span><b id="cv-num"></b></div>
         <div><span>Fecha</span><b id="cv-f"></b></div>
         <div><span>Vigente hasta</span><b id="cv-vig"></b></div>
-        <div><span>Preparada por</span><b id="cv-s"></b></div>
+        <div><span>Asesor</span><b id="cv-s"></b></div>
         <div><span>Atención</span><b id="cv-con"></b></div>
         <div><span>Contacto</span><b id="cv-wa"></b></div>
       </div>
@@ -130,7 +130,7 @@
         <div><span>Número</span><b id="h-num"></b></div>
         <div><span>Fecha</span><b id="h-f"></b></div>
         <div><span>Vigente hasta</span><b id="h-vig"></b></div>
-        <div><span>Preparada por</span><b id="h-s"></b></div>
+        <div><span>Asesor</span><b id="h-s"></b></div>
       </div>
     </section>
 
@@ -367,7 +367,8 @@
   $("conds").innerHTML = C.map(function (t, i) { return "<li><b>" + (i + 1) + ".</b><span>" + A.esc(t) + "</span></li>"; }).join("");
 
   $("copy-link").addEventListener("click", function () { A.copiar(location.href, $("copy-link")); });
-  $("to-asesor").href = A.waLink(p.s.w, "Hola, " + p.s.n + ". Generé la propuesta " + p.num + " para " + p.c.rs + ": " + location.href);
+  if (!p.s.n) $("to-asesor").textContent = "Enviar a Argos por WhatsApp";
+  $("to-asesor").href = A.waLink(p.s.w, "Hola" + (p.s.n ? ", " + p.s.n : "") + ". Generé la propuesta " + p.num + " para " + p.c.rs + (p.s.c ? " (código de aliado " + p.s.c + ")" : "") + ": " + location.href);
 
   function valid() { return $("a-n").value.trim() && $("a-c").value.trim() && /.+@.+\..+/.test($("a-m").value) && $("a-ok").checked; }
   ["a-n", "a-c", "a-m", "a-ok"].forEach(function (id) { ["input", "change"].forEach(function (ev) { $(id).addEventListener(ev, function () { $("a-go").disabled = !valid(); }); }); });
@@ -375,10 +376,10 @@
     if (!valid()) return;
     var when = new Date().toLocaleString("es-VE");
     var msg = "ACEPTACIÓN DE PROPUESTA " + p.num + "\nEmpresa: " + p.c.rs + " (" + p.c.rif + ")\nAcepta: " + $("a-n").value.trim() + ", " + $("a-c").value.trim() +
-      "\nCorreo: " + $("a-m").value.trim() + "\nFecha y hora: " + when + "\nEnlace: " + location.href;
+      "\nCorreo: " + $("a-m").value.trim() + "\nAsesor: " + (p.s.n || "sin indicar") + (p.s.c ? " (código de aliado " + p.s.c + ")" : "") + "\nFecha y hora: " + when + "\nEnlace: " + location.href;
     window.open(A.waLink(p.s.w, msg), "_blank", "noopener");
     $("a-done").hidden = false;
-    $("a-done").innerHTML = "<b>Gracias.</b> Se abrió WhatsApp con su aceptación para " + A.esc(p.s.n) + " (" + A.esc(A.waFmt(p.s.w)) + "). Envíe el mensaje para completarla. Si WhatsApp no se abrió, escriba a ese número indicando el número de propuesta " + A.esc(p.num) + ".";
+    $("a-done").innerHTML = "<b>Gracias.</b> Se abrió WhatsApp con su aceptación para " + A.esc(p.s.n || "Argos Compliance") + " (" + A.esc(A.waFmt(p.s.w)) + "). Envíe el mensaje para completarla. Si WhatsApp no se abrió, escriba a ese número indicando el número de propuesta " + A.esc(p.num) + ".";
   });
 })();
 </script>
