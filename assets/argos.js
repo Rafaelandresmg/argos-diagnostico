@@ -65,6 +65,14 @@ window.Argos = (function () {
     var done = function () { var o = btn.textContent; btn.textContent = ok || "Copiado"; setTimeout(function () { btn.textContent = o; }, 1500); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(function () { btn.textContent = "Selecciónelo y cópielo a mano"; });
   }
-  return { PRECIOS: PRECIOS, VIGENCIA_DIAS: VIGENCIA_DIAS, ALCANCE: ALCANCE, WA_ARGOS: WA_ARGOS, b64enc: b64enc, b64dec: b64dec, store: store, vendedor: vendedor,
+  // Buzón de prospectos del CRM (función lead de Supabase). Si falla, el cliente no lo nota.
+  var LEAD_URL = "https://iydvtcywbbqqyvfxjjzs.supabase.co/functions/v1/lead";
+  function lead(body) {
+    try {
+      fetch(LEAD_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), keepalive: true, mode: "cors" }).catch(function () {});
+    } catch (e) { /* sin conexión: la propuesta sigue funcionando */ }
+  }
+
+  return { lead: lead, PRECIOS: PRECIOS, VIGENCIA_DIAS: VIGENCIA_DIAS, ALCANCE: ALCANCE, WA_ARGOS: WA_ARGOS, b64enc: b64enc, b64dec: b64dec, store: store, vendedor: vendedor,
     hoy: hoy, numero: numero, sumarDias: sumarDias, fecha: fecha, usd: usd, esc: esc, waFmt: waFmt, waLink: waLink, montos: montos, copiar: copiar };
 })();

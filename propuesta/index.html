@@ -374,6 +374,7 @@
   ["a-n", "a-c", "a-m", "a-ok"].forEach(function (id) { ["input", "change"].forEach(function (ev) { $(id).addEventListener(ev, function () { $("a-go").disabled = !valid(); }); }); });
   $("a-go").addEventListener("click", function () {
     if (!valid()) return;
+    A.lead({ t: "accept", num: p.num, n: $("a-n").value.trim(), c: $("a-c").value.trim(), m: $("a-m").value.trim(), p: p, url: location.href });
     var when = new Date().toLocaleString("es-VE");
     var msg = "ACEPTACIÓN DE PROPUESTA " + p.num + "\nEmpresa: " + p.c.rs + " (" + p.c.rif + ")\nAcepta: " + $("a-n").value.trim() + ", " + $("a-c").value.trim() +
       "\nCorreo: " + $("a-m").value.trim() + "\nAsesor: " + (p.s.n || "sin indicar") + (p.s.c ? " (código de aliado " + p.s.c + ")" : "") + "\nFecha y hora: " + when + "\nEnlace: " + location.href;

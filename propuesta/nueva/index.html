@@ -91,7 +91,8 @@
     <h2>3. Revisión</h2>
     <div id="review"></div>
     <label class="row small" style="margin-top:14px;align-items:flex-start;flex-wrap:nowrap"><input type="checkbox" id="cons" style="margin-top:4px">
-      <span>Autorizo a Argos Compliance a usar los datos de este formulario para preparar mi propuesta y contactarme sobre ella. Puedo pedir que los corrijan o los eliminen escribiendo a mi asesor, en ejercicio del derecho de habeas data (artículo 28 de la Constitución).</span></label>
+      <span>Autorizo a Argos Compliance a registrar los datos de este formulario en su sistema comercial para preparar mi propuesta y contactarme sobre ella. Puedo pedir que los corrijan o los eliminen escribiendo a mi asesor, en ejercicio del derecho de habeas data (artículo 28 de la Constitución).</span></label>
+    <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"><label for="web">No llenar<input id="web" tabindex="-1" autocomplete="off"></label></div>
     <div class="warn" id="missing" hidden style="margin-top:12px"></div>
     <div class="row" style="margin-top:14px">
       <button class="btn accent" id="gen" type="button" style="font-size:16px;padding:16px 22px">Generar mi propuesta →</button>
@@ -198,8 +199,10 @@
     if (missing().length) return;
     var p = data();
     p.num = A.numero(iniciales(p.s.n)); p.f = A.hoy(); p.vig = A.VIGENCIA_DIAS;
-    p.cons = { v: "2026-10-14", at: new Date().toISOString() };
-    location.href = new URL("../", location.href).href + "#p=" + A.b64enc(p);
+    p.cons = { v: "2026-10-15", at: new Date().toISOString() };
+    var url = new URL("../", location.href).href + "#p=" + A.b64enc(p);
+    A.lead({ t: "new", p: p, url: url, hp: $("web").value });
+    location.href = url;
   });
   go(1); window.scrollTo(0, 0);
 })();
