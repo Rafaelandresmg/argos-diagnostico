@@ -16,7 +16,7 @@ window.Argos = (function () {
     { k: "constancia", t: "Constancia de debida diligencia en PDF por cada sujeto evaluado", def: true },
     { k: "volumen", t: "Hasta 2.000 consultas al año", def: true },
     { k: "capacitacion", t: "16 horas de configuración y capacitación", def: true },
-    { k: "soporte", t: "Soporte directo con el equipo de Argos", def: true }
+    { k: "soporte", t: "Soporte continuo con el equipo de Argos durante toda la vigencia del plan", def: true }
   ];
 
   function b64enc(obj) {

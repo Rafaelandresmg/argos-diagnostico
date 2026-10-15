@@ -32,7 +32,35 @@
   .conds li { display: grid; grid-template-columns: 36px 1fr; gap: 6px; }
   .conds li b { font: 600 13px/1.6 var(--mono); color: var(--bronce-ink); }
   .print-only { display: none; }
+  .verdict { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; }
+  @media (max-width: 600px) { .verdict { grid-template-columns: 1fr; } }
+  .verdict h2 { margin: 0 0 6px; }
+  .verdict p { margin: 0 0 6px; }
+  .gauge { width: 140px; height: 140px; border-radius: 50%; display: grid; place-items: center; color: var(--on-riesgo); text-align: center; }
+  .gauge strong { display: block; font: 700 22px/1.3 var(--sans); }
+  .gauge span { font: 600 11px/1.5 var(--mono); }
+  .lv-BAJO { background: var(--bajo); } .lv-MODERADO { background: var(--moderado); } .lv-ALTO { background: var(--alto); }
   .sign { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 10px; }
+  .promise h2 { font: 600 22px/1.35 var(--sans); color: var(--navy); margin: 0 0 8px; }
+  .promise p { margin: 0 0 6px; }
+  .benef { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 720px) { .benef { grid-template-columns: 1fr; } }
+  .benef div { border-top: 1px solid var(--line); padding-top: 10px; }
+  .benef h3, .commit h3, .bonus h3 { font: 600 15px/1.35 var(--sans); color: var(--navy); margin: 0 0 4px; }
+  .benef p, .commit p, .bonus p { margin: 0; font-size: 14px; }
+  .commit { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .commit li { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+  .commit li::before { content: "✓"; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: var(--on-navy); font-weight: 700; font-size: 13px; }
+  .bonus { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .bonus { grid-template-columns: 1fr; } }
+  .bonus div { border: 1px dashed var(--bronce); border-radius: 8px; padding: 12px 14px; }
+  .bonus .inc { font: 600 11px/1.4 var(--mono); color: var(--bronce-ink); letter-spacing: .5px; text-transform: uppercase; }
+  .reprice { background: var(--navy); color: var(--on-navy); border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; }
+  .reprice b { color: #E0BE6A; }
+  .reprice p { margin: 0 0 6px; } .reprice p:last-child { margin: 0; }
+  .faq { margin: 0; display: grid; gap: 12px; }
+  .faq dt { font: 600 15px/1.4 var(--sans); color: var(--navy); }
+  .faq dd { margin: 2px 0 0; font-size: 14px; }
   .sign div { border-top: 1px solid var(--ink); padding-top: 6px; font-size: 12px; }
 
   @media print {
@@ -57,6 +85,9 @@
     .cover .meta b { font: 500 11pt var(--mono); }
     .cover .foot { margin-top: 10mm; font-size: 8pt; color: #A9B8C8; }
     .sigblock { break-inside: avoid; }
+    .reprice { border-radius: 0; padding: 5mm 6mm; margin: 0 0 9mm; break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .commit li::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .benef, .bonus, .faq div, .commit li { break-inside: avoid; }
   }
 </style>
 </head>
@@ -113,13 +144,34 @@
     </section>
 
     <section class="card" id="sec-diag" hidden>
-      <p class="label">Lo que encontramos en su diagnóstico</p>
-      <p id="diag-sum"></p>
-      <ul class="list gaps" id="diag-list"></ul>
+      <p class="label" id="diag-head">Su diagnóstico</p>
+      <div class="verdict">
+        <div class="gauge" id="gauge"><div><strong id="g-lv"></strong><span id="g-pct"></span></div></div>
+        <div>
+          <h2 id="v-title"></h2>
+          <p id="v-text"></p>
+          <p class="small muted">Cálculo: brechas ponderadas sobre el total posible (parcial cuenta la mitad). BAJO hasta 25%, MODERADO hasta 50%, ALTO por encima.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card promise">
+      <p class="label">Lo que le proponemos</p>
+      <h2>Que su equipo revise a cada cliente, empleado y proveedor en segundos y tenga la evidencia lista cuando llegue la inspección.</h2>
+      <p id="prom-txt"></p>
     </section>
 
     <section class="card">
-      <p class="label">Lo que incluye su plan</p>
+      <p class="label">Lo que gana su empresa</p>
+      <div class="benef">
+        <div><h3>Tiempo</h3><p>Una consulta toma unos 20 segundos y revisa todas las fuentes a la vez. Su equipo deja de cruzar hojas de cálculo y páginas de organismos distintos.</p></div>
+        <div><h3>Certeza</h3><p>Listas restrictivas con lector propio sobre la fuente oficial, PEP desde la Gaceta Oficial, sentencias del TSJ y prensa. Cada constancia dice qué fuentes se consultaron.</p></div>
+        <div><h3>Evidencia</h3><p>Cada consulta queda registrada con fecha, fuentes, resultado y código hash SHA-256, y genera una constancia en PDF que puede presentar ante un inspector o un auditor.</p></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="label" id="alc-head">Lo que recibe</p>
       <ul class="list" id="alc"></ul>
     </section>
 
@@ -162,6 +214,32 @@
       <div id="money"></div>
     </section>
 
+    <section class="card plan-only">
+      <p class="label">Nuestro compromiso con usted</p>
+      <ul class="commit">
+        <li><div><h3>Argos queda totalmente operativo en su empresa</h3><p>No damos por terminada la instalación hasta que su equipo tenga sus usuarios, su cartera cargada y su matriz lista para hacer su primera consulta.</p></div></li>
+        <li><div><h3>Capacitación incluida, con una sesión adicional sin costo</h3><p>La instalación incluye 16 horas de configuración y capacitación. Si al terminarlas su equipo todavía necesita ayuda para operar Argos, le damos una sesión adicional sin costo.</p></div></li>
+        <li><div><h3>Su matriz de riesgo, parametrizada para su empresa</h3><p>Ajustamos los factores y los niveles de la matriz a su actividad, sus productos y sus clientes. No le entregamos una plantilla genérica.</p></div></li>
+        <li><div><h3>Soporte continuo</h3><p>Mientras su plan esté vigente, su equipo cuenta con el soporte de Argos por los canales oficiales.</p></div></li>
+        <li><div><h3>Sus datos son suyos</h3><p>Si decide cancelar, tiene 30 días continuos para descargar su cartera en Excel y sus constancias en PDF.</p></div></li>
+      </ul>
+    </section>
+
+    <section class="card plan-only">
+      <p class="label">Incluido en su instalación, sin costo adicional</p>
+      <div class="bonus">
+        <div><span class="inc">Incluido</span><h3>Carga inicial de su cartera</h3><p>Cargamos sus clientes actuales para que Argos los revise desde el primer día, sin que su equipo los transcriba uno por uno.</p></div>
+        <div><span class="inc">Incluido</span><h3>Configuración de su matriz de riesgo</h3><p>Dejamos la matriz con sus factores y sus niveles BAJO, MODERADO y ALTO, lista para calificar a cada sujeto.</p></div>
+      </div>
+    </section>
+
+    <section class="reprice" id="reprice"></section>
+
+    <section class="card">
+      <p class="label">Preguntas frecuentes</p>
+      <dl class="faq" id="faq"></dl>
+    </section>
+
     <section class="card">
       <p class="label">Condiciones comerciales</p>
       <ol class="conds" id="conds"></ol>
@@ -172,8 +250,8 @@
       <ol class="next">
         <li><div><b>Aceptación de esta propuesta</b><div class="small muted">En línea o firmando este documento.</div></div></li>
         <li><div><b>Firma del contrato de servicio y de los Términos y Condiciones</b><div class="small muted">Le enviamos el contrato, el correo de bienvenida y la guía de uso.</div></div></li>
-        <li><div><b>Configuración y capacitación</b><div class="small muted">16 horas para dejar la matriz, la cartera inicial y los usuarios listos.</div></div></li>
-        <li><div><b>Primera consulta</b><div class="small muted">En los días siguientes a la firma.</div></div></li>
+        <li><div><b>Instalación y capacitación</b><div class="small muted">Cargamos su cartera, parametrizamos su matriz, creamos sus usuarios y capacitamos a su equipo.</div></div></li>
+        <li><div><b>Argos operativo</b><div class="small muted">Su equipo hace su primera consulta y recibe su primera constancia.</div></div></li>
       </ol>
     </section>
 
@@ -237,9 +315,37 @@
 
   if (nb) {
     $("sec-diag").hidden = false;
-    $("diag-sum").innerHTML = "Nivel de riesgo de cumplimiento: <b class='c-" + A.esc(p.d.lv) + "'>" + A.esc(p.d.lv) + "</b> (" + A.esc(p.d.pct) + "% de exposición). Argos cubre " + na + " de sus " + nb + " brechas.";
-    $("diag-list").innerHTML = p.d.gaps.map(function (g) { return "<li><span>" + A.esc(g[0]) + (g[1] ? ' <span class="chip argos">Argos lo cubre</span>' : ' <span class="chip">Acción de su empresa</span>') + (g[2] ? ' <span class="chip only">Solo en Argos</span>' : "") + "</span></li>"; }).join("");
+    var TXT = {
+      BAJO: "Tiene lo básico, pero aún quedan huecos que una inspección encontraría primero.",
+      MODERADO: "Su debida diligencia tiene brechas importantes que pueden convertirse en observaciones en una inspección y le cuestan horas cada mes.",
+      ALTO: "Su debida diligencia tiene brechas en controles críticos. Hoy su empresa está expuesta en lo legal, lo operativo y lo reputacional, y su equipo pierde horas en un proceso manual."
+    };
+    var lv = /^(BAJO|MODERADO|ALTO)$/.test(p.d.lv) ? p.d.lv : "ALTO";
+    $("diag-head").textContent = "Su diagnóstico · " + A.fecha(p.f);
+    $("gauge").className = "gauge lv-" + lv; $("g-lv").textContent = lv; $("g-pct").textContent = (+p.d.pct || 0) + "% de exposición";
+    $("v-title").textContent = "Nivel de riesgo de cumplimiento: " + lv;
+    $("v-text").textContent = TXT[lv];
   }
+  // Promesa: menciona las horas del diagnóstico sin cifras
+  var h = p.d ? +p.d.h || 0 : 0;
+  set("prom-txt", h ? "Según su diagnóstico, su equipo dedica hoy horas cada mes a verificar sujetos a mano. Con Argos, ese tiempo se va en revisar resultados, no en buscarlos." :
+    "Hoy esa revisión se hace a mano, fuente por fuente. Con Argos, su equipo dedica su tiempo a revisar resultados, no a buscarlos.");
+  set("alc-head", plan ? "Lo que recibe con su plan" : "Lo que recibe");
+  [].forEach.call(document.querySelectorAll(".plan-only"), function (el) { el.hidden = !plan; });
+  $("reprice").innerHTML = plan ?
+    "<p>Todo lo anterior por <b>" + A.usd(A.PRECIOS.plan) + " + IVA al mes</b>, más una instalación única de <b>" + A.usd(A.PRECIOS.instalacion) + " + IVA</b> que incluye la carga de su cartera, su matriz parametrizada y 16 horas de capacitación.</p><p>Esta propuesta vence el <b>" + A.esc(A.fecha(vence)) + "</b>.</p>" :
+    "<p>Todo lo anterior por <b>" + A.usd(mm.total) + "</b> con IVA.</p><p>Esta propuesta vence el <b>" + A.esc(A.fecha(vence)) + "</b>.</p>";
+  var FAQ = [
+    ["¿Argos me exime de mi responsabilidad como sujeto obligado?", "No. Argos le entrega la evidencia de cada consulta para que su empresa decida. La evaluación de cada coincidencia, la decisión y la responsabilidad siguen siendo de su empresa."],
+    ["¿Qué pasa con los datos de mis clientes?", "Argos los trata por cuenta y siguiendo las instrucciones de su empresa, solo para prestarle el servicio. Si cancela, tiene 30 días continuos para descargar su información."],
+    ["¿Cómo se paga?", "Únicamente en bolívares, al tipo de cambio oficial del BCV de la fecha del pago. Los precios se expresan en dólares como referencia."],
+    plan ? ["¿Tengo que firmar por un tiempo mínimo?", "No. El plan es mes a mes y puede cancelarlo antes del inicio del mes siguiente."] : null,
+    plan ? ["¿Qué incluye la instalación?", "La carga inicial de su cartera, la parametrización de su matriz de riesgo, la creación de sus usuarios y 16 horas de configuración y capacitación."] : null,
+    ["¿Qué pasa si una fuente no está disponible al momento de la consulta?", "La constancia lo indica de forma visible. En ese caso, la ausencia de coincidencias no debe leerse como un resultado limpio."],
+    ["Mi empresa es nueva o tiene pocos clientes. ¿Me sirve?", "Sí. Desde el primer cliente, cada consulta queda registrada y respaldada con su constancia, y su cartera crece ya revisada."]
+  ].filter(Boolean);
+  $("faq").innerHTML = FAQ.map(function (q) { return "<div><dt>" + A.esc(q[0]) + "</dt><dd>" + A.esc(q[1]) + "</dd></div>"; }).join("");
+
   var byK = {}; A.ALCANCE.forEach(function (a) { byK[a.k] = a.t; });
   $("alc").innerHTML = (p.alc || []).filter(function (k) { return byK[k]; }).map(function (k) { return "<li><span>" + A.esc(byK[k]) + "</span></li>"; }).join("");
 

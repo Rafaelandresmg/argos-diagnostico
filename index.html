@@ -259,7 +259,7 @@ button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
     $("gaps-int").innerHTML = it.map(function (g) { return li(g, false); }).join("");
     $("int-card").hidden = !it.length;
     $("cta-big").textContent = ag.length ? "Argos cubre " + ag.length + " de sus " + r.gaps.length + " brechas." : "Mantenga su nivel con menos horas.";
-    var pay = {lv: r.lv, pct: r.pct, gaps: r.gaps.map(function (g) { return [g.gap, g.internal ? 0 : 1, g.only ? 1 : 0]; })};
+    var pay = {lv: r.lv, pct: r.pct, h: Math.round(r.hrs * 10) / 10, hl: Math.round(Math.max(r.hrs - r.argosHrs, 0) * 10) / 10, gaps: r.gaps.map(function (g) { return [g.gap, g.internal ? 0 : 1, g.only ? 1 : 0]; })};
     var bin = ""; new TextEncoder().encode(JSON.stringify(pay)).forEach(function (b) { bin += String.fromCharCode(b); });
     var enc = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     $("to-prop").href = "propuesta/nueva/" + location.search + "#d=" + enc;
