@@ -110,7 +110,7 @@
       <img src="../assets/logo-negativo.svg" alt="Argos Compliance">
       <div class="k">Propuesta de servicio</div>
       <h1 id="cv-rs"></h1>
-      <p class="tag2">Debida diligencia LC/FT/FPADM rápida, segura y local: listas restrictivas, PEP, sentencias del TSJ y prensa en unos 20 segundos, con el registro de cada consulta.</p>
+      <p class="tag2">Debida diligencia LC/FT/FPADM rápida, segura y local: listas restrictivas, PEP, sentencias del TSJ y prensa en segundos, con el registro de cada consulta.</p>
       <div class="meta">
         <div><span>Número</span><b id="cv-num"></b></div>
         <div><span>Fecha</span><b id="cv-f"></b></div>
@@ -125,7 +125,7 @@
     <section class="hero">
       <p class="label" style="color:var(--bronce)">Propuesta para</p>
       <h1 id="h-rs"></h1>
-      <p class="lede">Debida diligencia rápida, segura y local: consulta de listas restrictivas, PEP, sentencias del TSJ y prensa en unos 20 segundos, con el registro de cada consulta.</p>
+      <p class="lede">Debida diligencia rápida, segura y local: consulta de listas restrictivas, PEP, sentencias del TSJ y prensa en segundos, con el registro de cada consulta.</p>
       <div class="kv">
         <div><span>Número</span><b id="h-num"></b></div>
         <div><span>Fecha</span><b id="h-f"></b></div>
@@ -146,11 +146,10 @@
     <section class="card" id="sec-diag" hidden>
       <p class="label" id="diag-head">Su diagnóstico</p>
       <div class="verdict">
-        <div class="gauge" id="gauge"><div><strong id="g-lv"></strong><span id="g-pct"></span></div></div>
+        <div class="gauge" id="gauge"><div><strong id="g-lv"></strong></div></div>
         <div>
           <h2 id="v-title"></h2>
           <p id="v-text"></p>
-          <p class="small muted">Cálculo: brechas ponderadas sobre el total posible (parcial cuenta la mitad). BAJO hasta 25%, MODERADO hasta 50%, ALTO por encima.</p>
         </div>
       </div>
     </section>
@@ -164,7 +163,7 @@
     <section class="card">
       <p class="label">Lo que gana su empresa</p>
       <div class="benef">
-        <div><h3>Tiempo</h3><p>Una consulta toma unos 20 segundos y revisa todas las fuentes a la vez. Su equipo deja de cruzar hojas de cálculo y páginas de organismos distintos.</p></div>
+        <div><h3>Tiempo</h3><p>Una consulta toma segundos y revisa todas las fuentes a la vez. Su equipo deja de cruzar hojas de cálculo y páginas de organismos distintos.</p></div>
         <div><h3>Certeza</h3><p>Listas restrictivas con lector propio sobre la fuente oficial, PEP desde la Gaceta Oficial, sentencias del TSJ y prensa. Cada constancia dice qué fuentes se consultaron.</p></div>
         <div><h3>Evidencia</h3><p>Cada consulta queda registrada con fecha, fuentes, resultado y código hash SHA-256, y genera una constancia en PDF que puede presentar ante un inspector o un auditor.</p></div>
       </div>
@@ -310,8 +309,8 @@
   var nb = p.d && p.d.gaps ? p.d.gaps.length : 0, na = nb ? p.d.gaps.filter(function (g) { return g[1]; }).length : 0;
   set("sum1", nb ? "El diagnóstico de " + p.c.rs + " dio un nivel de riesgo de cumplimiento " + p.d.lv + ", con " + nb + " brechas. Argos cubre " + na + " de ellas desde el primer día." :
     p.c.rs + " necesita verificar a sus clientes, empleados y proveedores contra listas restrictivas y personas expuestas políticamente, y poder demostrarlo ante una inspección.");
-  set("sum2", "Proponemos " + (plan ? "el plan mensual de Argos: consultas a listas restrictivas, PEP, sentencias del TSJ y prensa en unos 20 segundos, con matriz de riesgo, revisión de la cartera y el registro de cada consulta." : p.q + " consulta(s) única(s) de Argos, sin plan ni instalación."));
-  set("sum3", "Inversión: " + (plan ? A.usd(A.PRECIOS.plan) + " + IVA al mes y una instalación única de " + A.usd(A.PRECIOS.instalacion) + " + IVA; primer pago de " + A.usd(mm.total) + " con IVA." : A.usd(mm.total) + " con IVA.") + " Propuesta vigente hasta el " + A.fecha(vence) + ".");
+  set("sum2", "Proponemos " + (plan ? "el plan mensual de Argos: consultas a listas restrictivas, PEP, sentencias del TSJ y prensa en segundos, con matriz de riesgo, revisión de la cartera y el registro de cada consulta." : p.q + " consulta(s) única(s) de Argos, sin plan ni instalación."));
+  set("sum3", "Inversión: " + (plan ? A.usd(A.PRECIOS.plan) + " + IVA al mes y una instalación única de " + A.usd(A.PRECIOS.instalacion) + " + IVA." : A.usd(A.PRECIOS.consulta) + " + IVA por consulta.") + " Propuesta vigente hasta el " + A.fecha(vence) + ".");
 
   if (nb) {
     $("sec-diag").hidden = false;
@@ -322,7 +321,7 @@
     };
     var lv = /^(BAJO|MODERADO|ALTO)$/.test(p.d.lv) ? p.d.lv : "ALTO";
     $("diag-head").textContent = "Su diagnóstico · " + A.fecha(p.f);
-    $("gauge").className = "gauge lv-" + lv; $("g-lv").textContent = lv; $("g-pct").textContent = (+p.d.pct || 0) + "% de exposición";
+    $("gauge").className = "gauge lv-" + lv; $("g-lv").textContent = lv;
     $("v-title").textContent = "Nivel de riesgo de cumplimiento: " + lv;
     $("v-text").textContent = TXT[lv];
   }
