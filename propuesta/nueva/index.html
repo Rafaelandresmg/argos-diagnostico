@@ -79,7 +79,7 @@
     <p class="label" style="margin-top:12px">Lo que incluye</p>
     <ul class="list" id="alc"></ul>
     <div class="prod">
-      <label><span class="rec">Recomendado</span><span><input type="radio" name="prod" value="plan" checked> Plan mensual</span><b>US$200 <small class="muted">+ IVA / mes</small></b><span class="small muted">Instalación única US$600 + IVA, con 16 horas de configuración y capacitación. Sin permanencia.</span></label>
+      <label><span class="rec">Recomendado</span><span><input type="radio" name="prod" value="plan" checked> Plan mensual</span><b>US$200 <small class="muted">+ IVA / mes</small></b><span class="small muted">Instalación única US$600 + IVA (US$1.200 + IVA para empresas de seguros y reaseguradoras), con 16 horas de configuración y capacitación. Sin permanencia.</span></label>
       <label><span><input type="radio" name="prod" value="unica"> Consulta única</span><b>US$20 <small class="muted">+ IVA / consulta</small></b><span class="small muted">Sin plan ni instalación.</span>
         <span class="f" id="q-wrap">Cantidad de consultas <input id="q" type="number" min="1" value="1" style="max-width:120px"></span></label>
     </div>
@@ -144,7 +144,7 @@
 
   function prod() { return document.querySelector('input[name="prod"]:checked').value; }
   function money() {
-    var mm = A.montos({ prod: prod(), q: $("q").value });
+    var mm = A.montos({ prod: prod(), q: $("q").value, sec: $("sec").value });
     $("money").innerHTML = '<table class="money"><tbody>' + mm.lines.map(function (l) { return "<tr><td>" + A.esc(l.t) + '</td><td class="n">' + A.usd(l.m) + "</td></tr>"; }).join("") +
       '<tr><td>IVA (16%)</td><td class="n">' + A.usd(mm.iva) + '</td></tr><tr class="total"><td>' + (prod() === "plan" ? "Primer pago (primer mes + instalación)" : "Total") + '</td><td class="n">' + A.usd(mm.total) + "</td></tr></tbody></table>";
     $("q-wrap").style.opacity = prod() === "unica" ? 1 : .4;

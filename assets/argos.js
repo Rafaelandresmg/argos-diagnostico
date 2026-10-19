@@ -1,6 +1,9 @@
 /* Lógica compartida del sitio comercial de Argos. Sin servidor: los datos de una propuesta viajan en el enlace. */
 window.Argos = (function () {
-  var PRECIOS = { plan: 200, instalacion: 600, consulta: 20, iva: 0.16 };
+  var PRECIOS = { plan: 200, instalacion: 600, instalacionSeguro: 1200, consulta: 20, iva: 0.16 };
+  // Empresas de seguros y reaseguradoras: la instalación del plan cuesta US$1.200 (los demás, US$600).
+  var SECTORES_SEGURO = ["Empresa de Seguros", "Reaseguradora"];
+  function instalacionPara(sec) { return SECTORES_SEGURO.indexOf(sec) >= 0 ? PRECIOS.instalacionSeguro : PRECIOS.instalacion; }
   var VIGENCIA_DIAS = 15;
   var WA_ARGOS = "584241250468";
 
@@ -48,12 +51,12 @@ window.Argos = (function () {
   function waFmt(w) { var d = String(w || "").replace(/\D/g, "").replace(/^58/, "0"); return d.length >= 11 ? d.slice(0, 4) + "-" + d.slice(4, 7) + "." + d.slice(7, 9) + "." + d.slice(9) : d; }
   function waLink(w, txt) { return "https://wa.me/" + String(w).replace(/\D/g, "") + "?text=" + encodeURIComponent(txt); }
 
-  // Montos de una propuesta. prod: "plan" | "unica"; q: consultas (solo unica).
+  // Montos de una propuesta. prod: "plan" | "unica"; q: consultas (solo unica); sec: sector (p.sec o p.c.sec).
   function montos(p) {
-    var lines = [];
+    var lines = [], sec = p.sec || (p.c && p.c.sec);
     if (p.prod === "plan") {
       lines.push({ t: "Plan mensual Argos (por mes)", m: PRECIOS.plan, rec: true });
-      lines.push({ t: "Instalación única: configuración y 16 horas de capacitación", m: PRECIOS.instalacion });
+      lines.push({ t: "Instalación única: configuración y 16 horas de capacitación", m: instalacionPara(sec) });
     } else {
       var q = Math.max(1, +p.q || 1);
       lines.push({ t: "Consulta única × " + q, m: PRECIOS.consulta * q });
@@ -73,6 +76,6 @@ window.Argos = (function () {
     } catch (e) { /* sin conexión: la propuesta sigue funcionando */ }
   }
 
-  return { lead: lead, PRECIOS: PRECIOS, VIGENCIA_DIAS: VIGENCIA_DIAS, ALCANCE: ALCANCE, WA_ARGOS: WA_ARGOS, b64enc: b64enc, b64dec: b64dec, store: store, vendedor: vendedor,
+  return { lead: lead, PRECIOS: PRECIOS, instalacionPara: instalacionPara, VIGENCIA_DIAS: VIGENCIA_DIAS, ALCANCE: ALCANCE, WA_ARGOS: WA_ARGOS, b64enc: b64enc, b64dec: b64dec, store: store, vendedor: vendedor,
     hoy: hoy, numero: numero, sumarDias: sumarDias, fecha: fecha, usd: usd, esc: esc, waFmt: waFmt, waLink: waLink, montos: montos, copiar: copiar };
 })();

@@ -310,7 +310,7 @@
   set("sum1", nb ? "El diagnóstico de " + p.c.rs + " dio un nivel de riesgo de cumplimiento " + p.d.lv + ", con " + nb + " brechas. Argos cubre " + na + " de ellas desde el primer día." :
     p.c.rs + " necesita verificar a sus clientes, empleados y proveedores contra listas restrictivas y personas expuestas políticamente, y poder demostrarlo ante una inspección.");
   set("sum2", "Proponemos " + (plan ? "el plan mensual de Argos: consultas a listas restrictivas, PEP, sentencias del TSJ y prensa en segundos, con matriz de riesgo, revisión de la cartera y el registro de cada consulta." : p.q + " consulta(s) única(s) de Argos, sin plan ni instalación."));
-  set("sum3", "Inversión: " + (plan ? A.usd(A.PRECIOS.plan) + " + IVA al mes y una instalación única de " + A.usd(A.PRECIOS.instalacion) + " + IVA." : A.usd(A.PRECIOS.consulta) + " + IVA por consulta.") + " Propuesta vigente hasta el " + A.fecha(vence) + ".");
+  set("sum3", "Inversión: " + (plan ? A.usd(A.PRECIOS.plan) + " + IVA al mes y una instalación única de " + A.usd(A.instalacionPara(p.c.sec)) + " + IVA." : A.usd(A.PRECIOS.consulta) + " + IVA por consulta.") + " Propuesta vigente hasta el " + A.fecha(vence) + ".");
 
   if (nb) {
     $("sec-diag").hidden = false;
@@ -332,7 +332,7 @@
   set("alc-head", plan ? "Lo que recibe con su plan" : "Lo que recibe");
   [].forEach.call(document.querySelectorAll(".plan-only"), function (el) { el.hidden = !plan; });
   $("reprice").innerHTML = plan ?
-    "<p>Todo lo anterior por <b>" + A.usd(A.PRECIOS.plan) + " + IVA al mes</b>, más una instalación única de <b>" + A.usd(A.PRECIOS.instalacion) + " + IVA</b> que incluye la carga de su cartera, su matriz parametrizada y 16 horas de capacitación.</p><p>Esta propuesta vence el <b>" + A.esc(A.fecha(vence)) + "</b>.</p>" :
+    "<p>Todo lo anterior por <b>" + A.usd(A.PRECIOS.plan) + " + IVA al mes</b>, más una instalación única de <b>" + A.usd(A.instalacionPara(p.c.sec)) + " + IVA</b> que incluye la carga de su cartera, su matriz parametrizada y 16 horas de capacitación.</p><p>Esta propuesta vence el <b>" + A.esc(A.fecha(vence)) + "</b>.</p>" :
     "<p>Todo lo anterior por <b>" + A.usd(mm.total) + "</b> con IVA.</p><p>Esta propuesta vence el <b>" + A.esc(A.fecha(vence)) + "</b>.</p>";
   var FAQ = [
     ["¿Argos me exime de mi responsabilidad como sujeto obligado?", "No. Argos le entrega la evidencia de cada consulta para que su empresa decida. La evaluación de cada coincidencia, la decisión y la responsabilidad siguen siendo de su empresa."],

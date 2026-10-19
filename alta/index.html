@@ -137,7 +137,7 @@
       "<h4>1. Partes</h4><p>1.1 <b>Proveedor:</b> Argos Compliance, C.A., " + pend("RIF, domicilio y número de inscripción en el Registro Mercantil") + ", representada por " + pend("representante legal") + ".</p>" +
       "<p>1.2 <b>Cliente:</b> " + val("rs", "razón social") + ", identificación " + val("rif", "identificación") + ", domicilio " + val("dom", "domicilio fiscal") + ", representada por " + val("rep", "representante legal") + ".</p>" +
       "<h4>2. Servicios contratados</h4><table><thead><tr><th>Concepto</th><th>Monto (US$, sin IVA)</th><th>Condiciones</th></tr></thead><tbody>" +
-      (plan ? "<tr><td>Instalación y puesta en marcha (pago único)</td><td>600</td><td>" + pend("momento de facturación") + ". Incluye la configuración inicial y 16 horas de capacitación de los usuarios designados.</td></tr>" +
+      (plan ? "<tr><td>Instalación y puesta en marcha (pago único)</td><td>" + A.instalacionPara(p.c.sec) + "</td><td>" + pend("momento de facturación") + ". Incluye la configuración inicial y 16 horas de capacitación de los usuarios designados.</td></tr>" +
               "<tr><td>Plan mensual</td><td>200 por mes</td><td>Acceso a la plataforma, consultas en las listas activas y emisión de constancias, hasta 2.000 consultas al año.</td></tr>"
             : "<tr><td>Consulta única × " + p.q + "</td><td>" + (20 * p.q) + "</td><td>Consultas puntuales, sin plan mensual ni instalación.</td></tr>") +
       "</tbody></table><p>2.1 A los montos se les suma el IVA vigente.</p><p>2.2 Los precios se expresan en dólares de los Estados Unidos de América, como moneda de cuenta. El pago se realiza en bolívares a la tasa oficial del BCV vigente el día del pago. " + pend("forma de pago aceptada") + "</p>" +
@@ -148,7 +148,7 @@
       "<h4>6. Firmas</h4><table><thead><tr><th>Por Argos Compliance, C.A.</th><th>Por " + val("rs", "razón social") + "</th></tr></thead><tbody><tr><td><br><br>Nombre: " + pend("firmante") + "<br>Cargo:<br>Fecha:</td><td><br><br>Nombre: " + val("rep", "representante legal") + "<br>Cargo:<br>Fecha:</td></tr></tbody></table>";
 
     var cdata = "nombre_entidad: " + v("rs", "") + "\nrif_entidad: " + v("rif", "") + "\ndomicilio_entidad: " + v("dom", "") + "\nrepresentante_cliente: " + v("rep", "") + "\nnombre_contacto: " + v("con", "") +
-      "\ncorreo: " + v("mail", "") + "\nproducto: " + (plan ? "Plan mensual US$200 + IVA; instalación US$600 + IVA" : "Consulta única × " + p.q) + "\npropuesta: " + p.num;
+      "\ncorreo: " + v("mail", "") + "\nproducto: " + (plan ? "Plan mensual US$200 + IVA; instalación US$" + A.instalacionPara(p.c.sec) + " + IVA" : "Consulta única × " + p.q) + "\npropuesta: " + p.num;
     $("c-data").textContent = cdata; $("c-copy").onclick = function () { A.copiar(cdata, $("c-copy")); };
   }
   $("o-print").addEventListener("click", function () { document.body.classList.add("print-orden"); window.print(); setTimeout(function () { document.body.classList.remove("print-orden"); }, 500); });
