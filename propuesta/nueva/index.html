@@ -154,7 +154,7 @@
     $("q-wrap").style.opacity = prod() === "unica" ? 1 : .4;
   }
   document.querySelectorAll('input[name="prod"]').forEach(function (r) { r.addEventListener("change", money); });
-  $("q").addEventListener("input", money); money();
+  $("q").addEventListener("input", money); $("sec").addEventListener("change", money); money();
 
   // Identificación: tipo (J, V, G o E) y número, sin límite de dígitos.
   function idNum() { return $("rifn").value.replace(/[\s.\-]/g, ""); }
