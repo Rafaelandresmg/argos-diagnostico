@@ -79,7 +79,7 @@
     <p class="label" style="margin-top:12px">Lo que incluye</p>
     <ul class="list" id="alc"></ul>
     <div class="prod">
-      <label><span class="rec">Recomendado</span><span><input type="radio" name="prod" value="plan" checked> Plan mensual</span><b>US$200 <small class="muted">+ IVA / mes</small></b><span class="small muted">Instalación única US$600 + IVA (US$1.200 + IVA para empresas de seguros y reaseguradoras), con 16 horas de configuración y capacitación. Sin permanencia.</span></label>
+      <label><span class="rec">Recomendado</span><span><input type="radio" name="prod" value="plan" checked> Plan mensual</span><b>US$200 <small class="muted">+ IVA / mes</small></b><span class="small muted">Instalación única <span id="inst-amt">US$600</span> + IVA, con 16 horas de configuración y capacitación. Sin permanencia.</span></label>
       <label><span><input type="radio" name="prod" value="unica"> Consulta única</span><b>US$20 <small class="muted">+ IVA / consulta</small></b><span class="small muted">Sin plan ni instalación.</span>
         <span class="f" id="q-wrap">Cantidad de consultas <input id="q" type="number" min="1" value="1" style="max-width:120px"></span></label>
     </div>
@@ -109,6 +109,10 @@
 <script src="../../assets/argos.js"></script>
 <script>
 (function () {
+  // La instalación del plan depende del sector elegido (empresas de seguros y reaseguradoras: US$1.200).
+  document.addEventListener("change", function (e) {
+    if (e.target.id === "sec") $("inst-amt").textContent = "US$" + A.instalacionPara(e.target.value).toLocaleString("es-VE");
+  });
   var A = window.Argos, $ = function (id) { return document.getElementById(id); }, step = 1, diag = null;
   var qp = new URLSearchParams(location.search);
 
